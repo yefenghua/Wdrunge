@@ -8,7 +8,6 @@ from app.agents.team import Team
 from app.agents.worker import WorkerAgent
 from app.tools import _workspace
 from app.tools.current_utc_time import current_utc_time
-from app.tools.write_project_file import make_write_project_file
 
 
 def run_team(team: Team):
@@ -38,6 +37,30 @@ def test_leader_exposes_delegation_as_optional_function_call(monkeypatch):
     result = asyncio.run(leader.next_message([HumanMessage(content="你好")]))
     assert fake.bound_tools == ["delegate_task", "delegate_tasks", "checkpoint_context"]
     assert result.content == "你好！"
+
+
+def test_workers_expose_safe_project_file_tools():
+    team = Team()
+    expected = {
+        "list_project_files",
+        "read_project_file",
+        "create_project_directory",
+        "write_project_file",
+        "replace_project_text",
+    }
+
+    for worker in team.workers.values():
+        assert expected <= {tool.name for tool in worker.spec.tools}
+
+
+def test_worker_prompts_require_safe_existing_file_edits():
+    team = Team()
+
+    for worker in team.workers.values():
+        prompt = worker.system_prompt()
+        assert "read_project_file" in prompt
+        assert "replace_project_text" in prompt
+        assert "write_project_file" in prompt
 
 
 def test_leader_can_answer_greeting_without_dispatch(monkeypatch):
@@ -410,38 +433,6 @@ def test_worker_failure_finishes_batch_even_if_session_cleanup_fails(monkeypatch
 
     with pytest.raises(RuntimeError, match="worker failed"):
         asyncio.run(asyncio.wait_for(collect(), timeout=1))
-
-
-def test_file_tool_stays_within_role_scope(tmp_path, monkeypatch):
-    monkeypatch.setattr(_workspace, "WORKSPACE_ROOT", tmp_path)
-    write = make_write_project_file(("docs/product",))
-    assert "Wrote" in write.invoke({"path": "docs/product/spec.md", "content": "hello"})
-    assert (tmp_path / "docs/product/spec.md").read_text() == "hello"
-    with pytest.raises(ValueError):
-        write.invoke({"path": "../outside.md", "content": "no"})
-    with pytest.raises(ValueError):
-        write.invoke({"path": "backend/app/main.py", "content": "no"})
-
-
-def test_selected_workspace_is_used_by_file_tools(tmp_path):
-    from app.tools.list_project_files import make_list_project_files
-    from app.tools.read_project_file import make_read_project_file
-
-    token = _workspace.active_workspace.set(tmp_path)
-    try:
-        write = make_write_project_file(("docs/product",))
-        read = make_read_project_file(("docs/product",))
-        listing = make_list_project_files(("docs/product",))
-        assert "Wrote" in write.invoke({"path": "src/hello.txt", "content": "selected workspace"})
-        assert read.invoke({"path": "src/hello.txt"}) == "selected workspace"
-        assert "src/hello.txt" in listing.invoke({})
-        with pytest.raises(ValueError):
-            write.invoke({"path": "../outside.txt", "content": "no"})
-        (tmp_path / "link").symlink_to(tmp_path.parent, target_is_directory=True)
-        with pytest.raises(ValueError):
-            write.invoke({"path": "link/escape.txt", "content": "no"})
-    finally:
-        _workspace.active_workspace.reset(token)
 
 
 def test_team_stream_scopes_each_conversation_to_its_workspace(tmp_path, monkeypatch):

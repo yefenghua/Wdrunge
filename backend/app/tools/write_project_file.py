@@ -15,7 +15,9 @@ def make_write_project_file(allowed_roots: tuple[str, ...]):
         if target.exists() and not target.is_file():
             return f"Not a regular file: {path}"
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(content, encoding="utf-8")
+        # newline="" prevents Windows from rewriting every LF as CRLF.
+        with target.open("w", encoding="utf-8", newline="") as file:
+            file.write(content)
         return f"Wrote {path} ({len(content)} characters)."
 
     return write_project_file

@@ -16,12 +16,14 @@ from app.agents.leader import LeaderAgent
 from app.agents.worker import WorkerAgent
 from app.tools.current_utc_time import current_utc_time
 from app.tools.checkpoint_context import ContextCheckpoint, checkpoint_context
+from app.tools.create_project_directory import make_create_project_directory
 from app.tools.delegate_task import Delegation, delegate_task
 from app.tools.delegate_tasks import DelegationBatch, delegate_tasks
 from app.tools.list_project_files import make_list_project_files
 from app.tools.read_project_file import make_read_project_file
 from app.tools.refresh_api_contract import refresh_api_contract
 from app.tools.refresh_frontend_client import refresh_frontend_client
+from app.tools.replace_project_text import make_replace_project_text
 from app.tools.run_project_check import run_project_check
 from app.tools.write_project_file import make_write_project_file
 from app.tools._workspace import active_workspace, workspace_root
@@ -31,35 +33,35 @@ ROLE_CONFIG = {
     "product": {
         "name": "产品",
         "prompt": "product.md",
-        "skills": ("requirements.md",),
+        "skills": ("requirements.md", "project_file_workflow.md"),
         "read": ("docs", "README.md", "backend/openapi.json"),
         "write": ("docs/product",),
     },
     "backend": {
         "name": "后端开发",
         "prompt": "backend.md",
-        "skills": ("api_contract.md",),
+        "skills": ("api_contract.md", "project_file_workflow.md"),
         "read": ("docs", "backend/app", "backend/pyproject.toml", "backend/tests"),
         "write": ("backend/app", "docs/backend"),
     },
     "designer": {
         "name": "美工",
         "prompt": "designer.md",
-        "skills": ("visual_design.md",),
+        "skills": ("visual_design.md", "project_file_workflow.md"),
         "read": ("docs", "frontend/src", "frontend/public"),
         "write": ("frontend/src", "frontend/public", "docs/design"),
     },
     "frontend": {
         "name": "前端开发",
         "prompt": "frontend.md",
-        "skills": ("api_contract.md",),
+        "skills": ("api_contract.md", "project_file_workflow.md"),
         "read": ("docs", "frontend/src", "frontend/public", "backend/openapi.json"),
         "write": ("frontend/src", "docs/frontend"),
     },
     "testing": {
         "name": "测试",
         "prompt": "testing.md",
-        "skills": ("test_strategy.md",),
+        "skills": ("test_strategy.md", "project_file_workflow.md"),
         "read": ("docs", "backend/app", "backend/tests", "frontend/src", "backend/openapi.json"),
         "write": ("backend/tests", "frontend/tests", "docs/testing"),
     },
@@ -105,7 +107,9 @@ class Team:
             tools = (
                 make_list_project_files(read_roots),
                 make_read_project_file(read_roots),
+                make_create_project_directory(write_roots),
                 make_write_project_file(write_roots),
+                make_replace_project_text(write_roots),
             )
             if role == "testing":
                 tools += (run_project_check,)

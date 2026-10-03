@@ -58,4 +58,16 @@ Set `QWEN_CONTEXT_WINDOW` to the actual context limit of the configured model. T
 - `app/agents/prompts/` contains each role's system prompt; `app/agents/skills/` contains optional role skill instructions.
 - `app/tools/` contains one Python module per tool. File tools are restricted to each role's assigned project paths.
 
+## Project file tools
+
+Each specialist receives the following tools for working inside the project selected by the user:
+
+- `list_project_files()` lists up to 150 visible files and skips generated or dependency directories such as `.git`, `.venv`, `node_modules`, `dist`, and `__pycache__`.
+- `read_project_file(path, start_line=1, end_line=None)` reads UTF-8 text. Large files can be inspected in ranges of at most 400 lines, and one response is limited to 30,000 characters.
+- `create_project_directory(path)` creates a directory and any missing parent directories. Calling it for an existing directory is safe.
+- `write_project_file(path, content)` creates a UTF-8 text file or intentionally replaces its complete contents. Content is limited to 100,000 characters.
+- `replace_project_text(path, old_text, new_text, expected_replacements=1)` edits an existing UTF-8 file only when the exact match count is the expected value. A mismatch leaves the file unchanged, preventing an outdated or ambiguous edit from modifying the wrong code.
+
+Paths must be relative to the selected workspace. Absolute paths, `..` traversal, and paths outside the worker's assigned area are rejected. Workers are instructed to list and read current files first, use `write_project_file` for new files or deliberate full rewrites, and prefer `replace_project_text` for targeted changes to existing files.
+
 The Leader can select any subset of members and call a member more than once over successive turns. Independent assignments in `delegate_tasks` run concurrently; dependent work waits for their results. For example, designer and frontend can exchange refinements over several calls. Greetings need no delegation. All members are initialized as `idle` on API startup and become `running` only during their assignment.

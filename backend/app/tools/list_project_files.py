@@ -16,7 +16,7 @@ def make_list_project_files(allowed_roots: tuple[str, ...]):
             if not directory.is_relative_to(workspace):
                 continue
             if directory.is_file():
-                files.append(str(directory.relative_to(workspace)))
+                files.append(directory.relative_to(workspace).as_posix())
                 continue
             if not directory.exists():
                 continue
@@ -25,7 +25,7 @@ def make_list_project_files(allowed_roots: tuple[str, ...]):
                     part in {".git", ".venv", "node_modules", "dist", "__pycache__"}
                     for part in path.parts
                 ):
-                    files.append(str(path.relative_to(workspace)))
+                    files.append(path.relative_to(workspace).as_posix())
         return "\n".join(sorted(set(files))[:150]) or "No files found."
 
     return list_project_files
