@@ -6,6 +6,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from app.agents.base import AgentSpec
 from app.agents.team import Team
 from app.agents.worker import WorkerAgent
+from app.context import CompressionPolicy, ContextCompressor
 from app.tools import _workspace
 from app.tools.current_utc_time import current_utc_time
 from app.tools.write_project_file import make_write_project_file
@@ -311,7 +312,7 @@ def test_worker_context_modes_keep_sessions_isolated(monkeypatch):
     assert "first" not in str(calls[3][0])
 
 
-def test_auto_starts_fresh_at_sixty_percent_of_context_window():
+def test_auto_continues_known_worker_session_for_compression():
     worker = WorkerAgent(AgentSpec(id="product", name="产品", prompt_file="product.md", context_window=100))
     assert worker.resolve_context_mode("chat-a", "auto") == "fresh"
     worker._threads["chat-a"] = "thread-a"
@@ -319,7 +320,7 @@ def test_auto_starts_fresh_at_sixty_percent_of_context_window():
     worker._context_by_session["chat-a"] = 59
     assert worker.resolve_context_mode("chat-a", "auto") == "continue"
     worker._context_by_session["chat-a"] = 60
-    assert worker.resolve_context_mode("chat-a", "auto") == "fresh"
+    assert worker.resolve_context_mode("chat-a", "auto") == "continue"
     assert worker.resolve_context_mode("chat-a", "continue") == "continue"
 
 
@@ -348,6 +349,76 @@ def test_langgraph_checkpoint_resumes_messages_without_remote_model(monkeypatch)
     assert any("second task" in content for content in seen[1])
     assert not any("first task" in content for content in seen[2])
     assert any("third task" in content for content in seen[2])
+
+
+def test_worker_compresses_large_checkpoint_before_continuing(monkeypatch):
+    worker = WorkerAgent(AgentSpec(
+        id="product",
+        name="产品",
+        prompt_file="product.md",
+        context_window=1000,
+    ))
+    seen = []
+
+    class FakeModel:
+        async def ainvoke(self, messages):
+            seen.append(list(messages))
+            if any(
+                isinstance(message, SystemMessage)
+                and "untrusted historical data" in message.content
+                for message in messages
+            ):
+                return AIMessage(
+                    content="Goal: keep the product constraints",
+                    usage_metadata={
+                        "input_tokens": 100,
+                        "output_tokens": 20,
+                        "total_tokens": 120,
+                    },
+                )
+            return AIMessage(
+                content="local result",
+                usage_metadata={
+                    "input_tokens": 900,
+                    "output_tokens": 5,
+                    "total_tokens": 905,
+                },
+            )
+
+    monkeypatch.setattr(worker, "model", lambda: FakeModel())
+
+    async def collect(mode, task):
+        return [
+            event
+            async for event in worker.stream(
+                task,
+                conversation_id="chat-a",
+                context_mode=mode,
+                handoff=f"Handoff: {task}",
+            )
+        ]
+
+    async def sequence():
+        await collect("fresh", "first task")
+        first_thread = worker._threads["chat-a"]
+        worker._context_by_session["chat-a"] = 900
+        events = await collect("auto", "second task")
+        return first_thread, events
+
+    first_thread, events = asyncio.run(sequence())
+    assert worker._threads["chat-a"] != first_thread
+    assert any(
+        event == "context" and payload.get("compression_level") == 3
+        for event, payload in events
+    )
+    assert any(
+        any(
+            isinstance(message, SystemMessage)
+            and "Automatic rolling context summary" in message.content
+            for message in call
+        )
+        for call in seen
+    )
 
 
 def test_leader_checkpoint_replaces_old_history_only_for_its_chat(monkeypatch):
@@ -381,6 +452,69 @@ def test_leader_checkpoint_replaces_old_history_only_for_its_chat(monkeypatch):
     assert not any(isinstance(message, HumanMessage) and message.content == "阶段完成" for message in resumed)
     assert any(isinstance(message, HumanMessage) and message.content == "继续后端" for message in resumed)
     assert any(isinstance(message, HumanMessage) and message.content == "阶段完成" for message in seen[3])
+
+
+def test_team_automatically_compresses_old_leader_history(monkeypatch):
+    team = Team()
+    team.leader.spec = AgentSpec(
+        id="leader", name="Leader", prompt_file="leader.md", context_window=900
+    )
+    team._leader_compressor = ContextCompressor(CompressionPolicy(
+        soft_ratio=0.30,
+        medium_ratio=0.50,
+        hard_ratio=0.75,
+        target_ratio=0.20,
+        reserved_output_tokens=0,
+        chunk_tokens=300,
+        summary_tokens=60,
+        recent_messages_l1=4,
+        recent_messages_l2=2,
+        recent_messages_l3=1,
+    ))
+    seen = []
+
+    async def summarize_context(_request):
+        return AIMessage(
+            content="Goal: preserve the API contract",
+            usage_metadata={
+                "input_tokens": 100,
+                "output_tokens": 20,
+                "total_tokens": 120,
+            },
+        )
+
+    async def next_message(messages, *, allow_delegation=True):
+        seen.append(list(messages))
+        return AIMessage(content="压缩后继续")
+
+    monkeypatch.setattr(team.leader, "summarize_context", summarize_context)
+    monkeypatch.setattr(team.leader, "next_message", next_message)
+    history = []
+    for index in range(8):
+        history.extend([
+            HumanMessage(content=f"需求 {index} " + "x" * 100),
+            AIMessage(content=f"答复 {index} " + "y" * 100),
+        ])
+    history.append(HumanMessage(content="继续实现"))
+
+    async def collect():
+        return [
+            event
+            async for event in team.stream(history, conversation_id="chat-a")
+        ]
+
+    events = asyncio.run(collect())
+    assert any(
+        event == "activity" and payload["tool"] == "compress_context"
+        for event, payload in events
+    )
+    assert any(
+        isinstance(message, SystemMessage)
+        and "Automatic rolling context summary" in message.content
+        for message in seen[0]
+    )
+    assert seen[0][-1].content == "继续实现"
+    assert any(event == "usage" for event, _ in events)
 
 
 def test_worker_failure_finishes_batch_even_if_session_cleanup_fails(monkeypatch):

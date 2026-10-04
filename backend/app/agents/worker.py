@@ -10,6 +10,7 @@ from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
 from app.agents.base import Agent
+from app.context import ContextCompressor
 
 TOOL_LABELS = {
     "current_utc_time": "查看当前时间",
@@ -29,6 +30,7 @@ class WorkerAgent(Agent):
         self._graph = None
         self._threads: dict[str, str] = {}
         self._context_by_session: dict[str, int] = {}
+        self._compressor = ContextCompressor()
 
     def build_graph(self):
         if self._graph is not None:
@@ -64,11 +66,12 @@ class WorkerAgent(Agent):
         used = self._context_by_session.get(conversation_id)
         if used is None:
             return "fresh"
-        return "fresh" if used >= self.context_window() * 0.6 else "continue"
+        return "continue"
 
     async def discard_session(self, conversation_id: str) -> None:
         thread_id = self._threads.pop(conversation_id, None)
         self._context_by_session.pop(conversation_id, None)
+        self._compressor.reset(conversation_id)
         if thread_id:
             await self._checkpointer.adelete_thread(thread_id)
 
@@ -81,14 +84,67 @@ class WorkerAgent(Agent):
         handoff: str,
     ) -> AsyncIterator[tuple[str, dict]]:
         resolved = self.resolve_context_mode(conversation_id, context_mode)
+        assignment = HumanMessage(
+            content=f"Assigned task: {task}\n\nHandoff context:\n{handoff}"
+        )
+        compression = None
+        compression_usage_changed = False
         if resolved == "fresh":
             await self.discard_session(conversation_id)
             self._threads[conversation_id] = uuid4().hex
-            messages: list[BaseMessage] = [SystemMessage(content=self.system_prompt())]
+            messages: list[BaseMessage] = [
+                SystemMessage(content=self.system_prompt()),
+                assignment,
+            ]
         else:
-            messages = []
-        messages.append(HumanMessage(content=f"Assigned task: {task}\n\nHandoff context:\n{handoff}"))
-        yield "context", {"mode": resolved}
+            messages = [assignment]
+            observed_tokens = self._context_by_session.get(conversation_id)
+            level = self._compressor.policy.level_for(
+                observed_tokens or 0, self.context_window()
+            )
+            if level:
+                graph = self.build_graph()
+                old_thread = self._threads[conversation_id]
+                config = {"configurable": {"thread_id": old_thread}}
+                snapshot = await graph.aget_state(config)
+                saved = list(snapshot.values.get("messages", []))
+                protected = []
+                if saved and isinstance(saved[0], SystemMessage):
+                    protected.append(saved.pop(0))
+                if not protected:
+                    protected.append(SystemMessage(content=self.system_prompt()))
+
+                async def summarize_context(
+                    request: str, _target_tokens: int
+                ) -> str:
+                    nonlocal compression_usage_changed
+                    response = await self.summarize_context(request)
+                    if self.record_usage(response):
+                        compression_usage_changed = True
+                    if not isinstance(response.content, str) or not response.content.strip():
+                        raise RuntimeError("Context summarizer returned empty content")
+                    return response.content.strip()
+
+                compression = await self._compressor.prepare(
+                    conversation_id=conversation_id,
+                    protected_messages=protected,
+                    history=[*saved, assignment],
+                    context_window=self.context_window(),
+                    summarize=summarize_context,
+                    revision=old_thread,
+                    observed_tokens=observed_tokens,
+                )
+                if compression.changed:
+                    await self._checkpointer.adelete_thread(old_thread)
+                    self._threads[conversation_id] = uuid4().hex
+                    messages = compression.messages
+
+        context_payload = {"mode": resolved}
+        if compression and compression.changed:
+            context_payload["compression_level"] = compression.level
+        yield "context", context_payload
+        if compression_usage_changed:
+            yield "usage", {}
         tool_names = {tool.name for tool in self.spec.tools}
         active_tools: dict[str, str] = {}
         async for event in self.build_graph().astream_events(

@@ -10,9 +10,11 @@
 
 ## 上下文续接与交接
 
-Leader 为每次派活选择 `fresh`、`continue` 或 `auto`。`fresh` 为该聊天中的成员创建干净的 LangGraph 线程，只提供角色提示词、当前任务和 `handoff`；`continue` 续接该成员在同一聊天中的线程，若线程不存在则安全退化为 `fresh`；`auto` 在最近一次输入 Token 低于配置的上下文窗口 60% 时续接，否则创建干净线程。若模型未提供用量，`auto` 也从干净线程开始。`handoff` 应写明目标、用户约束、已完成决定及有关文件路径，不能依赖成员记得旧对话。
+Leader 为每次派活选择 `fresh`、`continue` 或 `auto`。`fresh` 为该聊天中的成员创建干净的 LangGraph 线程，只提供角色提示词、当前任务和 `handoff`；`continue` 续接该成员在同一聊天中的线程，若线程不存在则安全退化为 `fresh`；`auto` 在存在可靠用量数据时续接，并由运行时在达到阈值时分级压缩旧上下文。若模型未提供用量，`auto` 从干净线程开始。`handoff` 应写明目标、用户约束、已完成决定及有关文件路径，不能依赖成员记得旧对话。
 
 Leader 可在阶段节点单独调用 `checkpoint_context`，保存目标、约束、产物路径、已完成和待办。之后同一聊天的 Leader 上下文由这份结构化摘要和后续消息构成。不同 `conversation_id` 的成员线程与 Leader 检查点相互隔离。它们目前只保存在后端进程内，重启后下一次派活会从干净线程开始；关键决定仍须写入项目文档。
+
+自动压缩与人工 checkpoint 并存：人工 checkpoint 是受保护的高优先级记忆；自动压缩只处理其后的过期前缀，并始终保留最近原始消息。压缩输入按有限 token 分块，再逐层归并摘要，不会把完整历史一次发送给摘要模型。详细策略见 [`context-compression-strategy.md`](context-compression-strategy.md)。
 
 ## SSE 可见事件
 

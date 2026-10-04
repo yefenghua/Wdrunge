@@ -13,6 +13,7 @@ from pydantic import ValidationError
 from app.agents.base import AgentSpec, AgentStatus
 from app.agents.leader import LeaderAgent
 from app.agents.worker import WorkerAgent
+from app.context import ContextCompressor
 from app.tools.current_utc_time import current_utc_time
 from app.tools.checkpoint_context import ContextCheckpoint, checkpoint_context
 from app.tools.delegate_task import Delegation, delegate_task
@@ -127,6 +128,7 @@ class Team:
         self.leader.system_prompt()
         self._lock = asyncio.Lock()
         self._leader_checkpoints: dict[str, LeaderCheckpoint] = {}
+        self._leader_compressor = ContextCompressor()
 
     def snapshot(self) -> list[dict]:
         return [self.leader.snapshot(), *(worker.snapshot() for worker in self.workers.values())]
@@ -154,14 +156,52 @@ class Team:
         yield "status", {"id": "leader", "status": AgentStatus.RUNNING}
         system = SystemMessage(content=self.leader.system_prompt())
         checkpoint = self._leader_checkpoints.get(conversation_id)
+        protected: list[BaseMessage] = [system]
+        history_start = 0
+        revision = "raw"
         if checkpoint and checkpoint.history_cutoff < len(history):
-            messages: list[BaseMessage] = [
-                system,
-                SystemMessage(content=checkpoint.handoff.as_prompt()),
-                *history[checkpoint.history_cutoff:],
-            ]
-        else:
-            messages = [system, *history]
+            protected.append(SystemMessage(content=checkpoint.handoff.as_prompt()))
+            history_start = checkpoint.history_cutoff
+            revision = f"checkpoint:{checkpoint.history_cutoff}"
+
+        compression_usage_changed = False
+
+        async def summarize_context(request: str, _target_tokens: int) -> str:
+            nonlocal compression_usage_changed
+            response = await self.leader.summarize_context(request)
+            if self.leader.record_usage(response):
+                compression_usage_changed = True
+            content = message_text(response).strip()
+            if not content:
+                raise RuntimeError("Context summarizer returned empty content")
+            return content
+
+        compression = await self._leader_compressor.prepare(
+            conversation_id=conversation_id,
+            protected_messages=protected,
+            history=history[history_start:],
+            context_window=self.leader.context_window(),
+            summarize=summarize_context,
+            revision=revision,
+            observed_tokens=self.leader.context_tokens or None,
+        )
+        messages = compression.messages
+        if compression.changed:
+            fallback = " · 抽取式兜底" if compression.used_fallback else ""
+            yield "activity", {
+                "id": uuid4().hex,
+                "agent": "leader",
+                "tool": "compress_context",
+                "description": (
+                    f"分级压缩上下文 L{compression.level} · "
+                    f"{compression.original_tokens} -> {compression.final_tokens} tokens · "
+                    f"覆盖 {compression.compressed_messages} 条消息 · "
+                    f"{compression.model_calls} 次摘要调用{fallback}"
+                ),
+                "phase": "completed",
+            }
+        if compression_usage_changed:
+            yield "usage", self.usage_snapshot()
         count = 0
 
         for _ in range(MAX_DELEGATIONS + 6):
@@ -218,6 +258,7 @@ class Team:
                         handoff=reset_handoff,
                         history_cutoff=len(history),
                     )
+                    self._leader_compressor.reset(conversation_id)
                     tool_result = ToolMessage(content="Coordination checkpoint saved. Continue from the handoff.", tool_call_id=call_id)
                     messages = [
                         system,
@@ -365,7 +406,10 @@ class Team:
                 if event == "content":
                     output.append(payload["content"])
                 elif event == "context":
-                    context_label = "干净上下文" if payload["mode"] == "fresh" else "续接上下文"
+                    if payload.get("compression_level"):
+                        context_label = f"压缩上下文 L{payload['compression_level']}"
+                    else:
+                        context_label = "干净上下文" if payload["mode"] == "fresh" else "续接上下文"
                     await queue.put(("activity", {
                         "id": event_id,
                         "agent": "leader",

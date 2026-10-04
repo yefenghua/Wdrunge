@@ -5,6 +5,7 @@ from enum import StrEnum
 import os
 from pathlib import Path
 
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 
@@ -84,6 +85,16 @@ class Agent:
             base_url=os.getenv(
                 "DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com/compatible-mode/v1"
             ),
+        )
+
+    async def summarize_context(self, request: str) -> AIMessage:
+        """Run the shared no-tools summarizer for bounded context compression."""
+        root = Path(__file__).resolve().parent
+        prompt = (root / "prompts" / "context_compressor.md").read_text(
+            encoding="utf-8"
+        )
+        return await self.model().ainvoke(
+            [SystemMessage(content=prompt), HumanMessage(content=request)]
         )
 
     def snapshot(self) -> dict:
