@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { createOfficeClock, formatOfficeTime, normalizeHour, sampleDaylight } from '../src/OfficeDaylight';
+import { createOfficeClock, formatOfficeTime, localClockHour, normalizeHour, sampleDaylight } from '../src/OfficeDaylight';
 
 test('daylight changes intensity, color temperature and direction across a day', () => {
   const dawn = sampleDaylight(6.5), noon = sampleDaylight(12), dusk = sampleDaylight(17.5), night = sampleDaylight(22);
@@ -35,6 +35,11 @@ test('simulated time wraps at midnight and formats minute boundaries correctly',
   assert.equal(formatOfficeTime(-.5), '23:30');
   assert.equal(formatOfficeTime(6.5), '06:30');
   assert.equal(formatOfficeTime(1439 / 60), '23:59');
+});
+
+test('system clock converts local hours, minutes, seconds and milliseconds to a scene hour', () => {
+  const value = new Date(2026, 9, 27, 18, 30, 45, 500);
+  assert.ok(Math.abs(localClockHour(value) - (18 + 30 / 60 + 45 / 3600 + 500 / 3_600_000)) < 1e-10);
 });
 
 test('physical clock hands show the selected time without rebuilding its model', () => {

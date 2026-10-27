@@ -6,6 +6,12 @@ export type Goal = {
   next_reminder_at: number; reminder_count: number; scale?: string | null;
 };
 const scaleLabels: Record<string, string> = { small: '小型', medium: '中型', large: '大型' };
+const scaleOptions = [
+  { value: '', label: '不限定', note: '按实际需求' },
+  { value: 'small', label: '小型', note: '每项最多 3 条' },
+  { value: 'medium', label: '中型', note: '目标 6 条 · 任务 5 条' },
+  { value: 'large', label: '大型', note: '最多 8 条' },
+];
 type Task = { id: string; goal_id?: string; state: string; summary?: string; goal?: string };
 
 export function AcceptanceForm({ criteria, busy, onAccept, label = '确认验收' }: {
@@ -42,9 +48,17 @@ export default function GoalPanel({ goals, tasks, busy, command, act }: {
       });
     }}><label>目标<textarea required maxLength={4000} value={objective} onChange={e => { setObjective(e.target.value); setKey(crypto.randomUUID()); }} /></label>
       <label>验收条件（每行一项，最多 8 项）<textarea required value={criteria} onChange={e => { setCriteria(e.target.value); setKey(crypto.randomUUID()); }} /></label>
-      <label>规模（限制验收条件数量并告诉成员做多少）<select value={scale} onChange={e => { setScale(e.target.value); setKey(crypto.randomUUID()); }}>
-        <option value="">不限定</option><option value="small">小型（每项最多 3 条）</option><option value="medium">中型（目标 6 条 / 任务 5 条）</option><option value="large">大型（8 条）</option>
-      </select></label>
+      <fieldset className="goal-scale">
+        <legend>任务规模</legend>
+        <p>控制验收项数量，并同步成员的交付范围</p>
+        <div className="goal-scale-options">
+          {scaleOptions.map(option => <label className={scale === option.value ? 'selected' : ''} key={option.value || 'unlimited'}>
+            <input type="radio" name="goal-scale" value={option.value} checked={scale === option.value}
+              onChange={() => { setScale(option.value); setKey(crypto.randomUUID()); }} />
+            <span>{option.label}</span><small>{option.note}</small>
+          </label>)}
+        </div>
+      </fieldset>
       <button disabled={busy || !objective.trim() || !criteria.trim()}>创建并持续跟进</button>
     </form></details>
     {!goals.length && <p className="collaboration-empty">暂无目标。多步任务可通过目标持续跟进和逐项验收。</p>}

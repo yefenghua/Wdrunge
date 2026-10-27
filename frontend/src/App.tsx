@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState, type FormEvent } from "react";
 import { isTauri } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 import {
@@ -14,7 +14,9 @@ import {
   getConversationEvents,
   getTeamStatus,
   getConversationUsage,
+  getCollaborationSnapshot,
   type SessionUsage,
+  type CollaborationSnapshot,
   listProjects,
   streamConversationMessage,
   type Activity,
@@ -29,7 +31,6 @@ import AgentContextPanel from "./AgentContextPanel";
 import CollaborationPanel from "./CollaborationPanel";
 import DeliveryPanel from "./DeliveryPanel";
 import { DeliveryPreview, useDeliveryFiles } from "./DeliveryFiles";
-import OfficeScene from "./OfficeScene";
 import AgentAvatar from "./AgentAvatar";
 import MessageContent from "./MessageContent";
 import { memberName, teamIdentities } from "./TeamIdentity";
@@ -37,6 +38,9 @@ import "./App.css";
 import ExecutionPermissions from './ExecutionPermissions';
 import ResourceSettings from './ResourceSettings';
 import SessionUsagePanel from './SessionUsagePanel';
+import { requestsForTurn, reviewProgress } from './DeliveryProgress';
+
+const OfficeScene = lazy(() => import("./OfficeScene"));
 
 type VisibleMessage = TeamChatMessage & {
   read?: boolean;
@@ -51,6 +55,21 @@ type ConversationView = Omit<ConversationDetail, "messages" | "activities"> & {
   activities: VisibleActivity[];
 };
 type Panel = "chat" | "activity" | "collaboration" | "context";
+
+const interfaceStyles = ["蓝紫科技", "清爽简约", "温暖自然", "活泼明亮", "杂志排版"] as const;
+const useScenarios = ["通用网站", "个人作品", "课程展示", "活动宣传", "内容主页", "产品介绍"] as const;
+const developmentPreferences = ["响应式布局", "移动端优先", "无障碍优先", "动效克制", "支持深色模式"] as const;
+
+function composePrompt(content: string, style: string, scenario: string, preferences: string[]) {
+  const constraints = [
+    style && `- 界面风格：${style}`,
+    scenario && `- 使用场景：${scenario}`,
+    preferences.length > 0 && `- 开发偏好：${preferences.join("、")}`,
+  ].filter(Boolean);
+  return constraints.length
+    ? `${content}\n\n补充要求（请在实现时遵循）：\n${constraints.join("\n")}`
+    : content;
+}
 
 const initialAgents: TeamMember[] = [
   { id: "leader", name: memberName("leader"), status: "idle", tools: [], skills: [] },
@@ -123,6 +142,9 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
   useEffect(() => { setShowCollaboration(false); }, [active?.id, panel]);
   const [search, setSearch] = useState("");
   const [input, setInput] = useState("");
+  const [interfaceStyle, setInterfaceStyle] = useState("");
+  const [useScenario, setUseScenario] = useState("");
+  const [preferences, setPreferences] = useState<string[]>([]);
   const [streamingConversation, setStreamingConversation] = useState<string | null>(null);
   const streaming = streamingConversation !== null;
   const [execution, setExecution] = useState<Record<string, ConversationExecution>>({});
@@ -152,7 +174,28 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
 
   const activeProject = projects.find((project) => project.id === (active?.project_id || activeProjectId));
   const [openFile, setOpenFile] = useState<{project: string; path: string} | null>(null);
+  const [collaborationSnapshot, setCollaborationSnapshot] = useState<CollaborationSnapshot>({ request: [] });
   const deliveryFiles = useDeliveryFiles(activeProject?.id);
+  const deliveredEntries = deliveryFiles.entries.filter((entry) => entry.kind === "file");
+  const latestUserMessage = [...(active?.messages || [])].reverse().find(message => message.sender === "user");
+  const latestUserMessageAt = latestUserMessage?.createdAt || 0;
+  const currentDeliveryEntries = deliveredEntries.filter((entry) => latestUserMessageAt > 0 && entry.modified / 1_000_000 >= latestUserMessageAt);
+  const previewEntry = [...currentDeliveryEntries].sort((left, right) => {
+    const priority = (path: string) => /(^|\/)index\.html?$/i.test(path) ? 0 : /\.html?$/i.test(path) ? 1 : /(^|\/)readme\.(md|markdown)$/i.test(path) ? 2 : /\.(png|jpe?g|webp|gif|svg|pdf)$/i.test(path) ? 3 : 4;
+    return priority(left.path) - priority(right.path) || left.path.localeCompare(right.path);
+  })[0];
+  useEffect(() => {
+    const project = activeProject?.id;
+    setCollaborationSnapshot({ request: [] });
+    if (!project) return;
+    const controller = new AbortController();
+    const refresh = () => void getCollaborationSnapshot(project, controller.signal)
+      .then(snapshot => { if (!controller.signal.aborted) setCollaborationSnapshot(snapshot); })
+      .catch(() => { /* Delivery progress retains its last verified state during a transient reconnect. */ });
+    refresh();
+    const timer = setInterval(refresh, 3000);
+    return () => { controller.abort(); clearInterval(timer); };
+  }, [activeProject?.id]);
   useEffect(() => { setOpenFile(null); }, [activeProject?.id]);
   function showFile(path: string) {
     if (activeProject) {
@@ -358,8 +401,9 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
 
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const content = input.trim();
-    if (!content || streaming || executionAction || !active) return;
+    const draft = input.trim();
+    if (!draft || streaming || executionAction || !active) return;
+    const content = composePrompt(draft, interfaceStyle, useScenario, preferences);
     const conversationId = active.id;
     const updateConversation = (update: (item: ConversationView) => ConversationView) =>
       setActive(current => current?.id === conversationId ? update(current) : current);
@@ -370,6 +414,9 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
       messages: [...item.messages, { id: clientMessageId, sender: "user", content, time: clockTime(), createdAt: Date.now() }],
     }));
     setInput("");
+    setInterfaceStyle("");
+    setUseScenario("");
+    setPreferences([]);
     setError("");
     executionVersion.current++;
     setExecution(current => ({ ...current, [conversationId]: { running: true, stopping: false, paused: current[conversationId]?.paused || false, pending_tasks: current[conversationId]?.pending_tasks || 0, active_goals: current[conversationId]?.active_goals || 0 } }));
@@ -443,6 +490,17 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
       : project.conversations.filter((conversation) => conversation.title.toLowerCase().includes(search.toLowerCase())),
   })).filter((project) => !search || project.name.toLowerCase().includes(search.toLowerCase()) || project.conversations.length > 0);
 
+  const hasUserRequest = latestUserMessageAt > 0;
+  const teamWorking = canStop;
+  const testingRunning = active?.activities.some((activity) => activity.agent === "testing" && activity.phase === "running" && (activity.createdAt || 0) >= latestUserMessageAt) || false;
+  const testingCompleted = active?.activities.some((activity) => activity.agent === "testing" && activity.phase === "completed" && (activity.createdAt || 0) >= latestUserMessageAt) || false;
+  const turnRequests = requestsForTurn(collaborationSnapshot.request || [], active?.id, latestUserMessage?.id, latestUserMessageAt);
+  const review = reviewProgress(turnRequests, testingRunning, testingCompleted);
+  const deliveryReady = currentDeliveryEntries.length > 0;
+  const finalCheckReady = deliveryReady && review.accepted && !teamWorking;
+  const progressStep = finalCheckReady ? 3 : deliveryReady || review.checking || review.accepted ? 2 : hasUserRequest ? 1 : 0;
+  const progressLabels = ["理解需求", "正在制作", "检查页面", "可以预览"];
+
   return <main className="workspace">
     <aside className="sidebar" aria-label="项目与聊天历史">
       <div className="sidebar-head">
@@ -473,7 +531,18 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
       </div>
     </aside>
 
-    <section className="office" aria-label="Agent 办公室"><div style={{width:'100%',height:'100%'}} inert={!!openFile}><OfficeScene agents={agents} /></div>{openFile && activeProject?.id === openFile.project && <DeliveryPreview key={`${openFile.project}:${openFile.path}`} project={openFile.project} path={openFile.path} revision={deliveryFiles.revision} status={deliveryFiles.status} onClose={() => setOpenFile(null)} onOpen={showFile} />}</section>
+    <section className="office" aria-label="Agent 办公室">
+      <div className="creation-progress" aria-label="制作进度" role="status">
+        <span className="creation-progress-label">制作进度</span>
+        {progressLabels.map((label, index) => <span className={`creation-progress-step ${index < progressStep ? "complete" : index === progressStep ? "current" : ""}`} key={label}><i aria-hidden="true" />{label}</span>)}
+      </div>
+      <div className="office-content" inert={!!openFile}>
+        <Suspense fallback={<div className="office-loading" role="status"><span aria-hidden="true" /><strong>正在准备办公场景</strong><small>首次加载 3D 资源可能需要一点时间</small></div>}>
+          <OfficeScene agents={agents} />
+        </Suspense>
+      </div>
+      {openFile && activeProject?.id === openFile.project && <DeliveryPreview key={`${openFile.project}:${openFile.path}`} project={openFile.project} path={openFile.path} revision={deliveryFiles.revision} status={deliveryFiles.status} onClose={() => setOpenFile(null)} onOpen={showFile} />}
+    </section>
 
     <aside className="right-rail" aria-label="团队交流与工作日志">
       <div className="rail-tabs" role="tablist" aria-label="右侧内容">
@@ -495,6 +564,19 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
           {active.messages.map((message) => <article className={`chat-message ${message.sender === "user" ? "mine" : ""}`} key={message.id}><AgentAvatar agent={message.sender} /><div className="message-body"><div className="message-meta"><strong>{nameOf(message.sender)}</strong><time>{message.time}</time></div><div className="bubble"><MessageContent message={message} /></div>{!!message.completedBy?.length && <div className="message-reactions" aria-label="任务完成状态">{message.completedBy.map((worker) => <span className="done-reaction" key={worker} title={`${nameOf(worker)}已完成`}><span aria-hidden="true">✓</span> Done · {nameOf(worker)}</span>)}</div>}</div></article>)}
           {canStop && <div className="processing"><i /><i /><i /><span>团队正在处理</span></div>}
         </div>
+        {hasUserRequest && <details className="delivery-ready-card" aria-label="页面制作状态">
+          <summary><div><span className="delivery-ready-spark" aria-hidden="true">✦</span><strong>{finalCheckReady ? "页面已准备好" : deliveryReady ? "页面正在检查" : "页面制作中"}</strong></div><span className="delivery-ready-meta"><small>{deliveryFiles.status === "live" ? "状态实时同步" : "正在连接项目文件"}</small><i aria-hidden="true">⌄</i></span></summary>
+          <div className="delivery-ready-body">
+            <div className="delivery-ready-checks">
+              {[
+                { label: "页面生成完成", done: deliveryReady, working: teamWorking && !deliveryReady },
+                { label: "交互检查完成", done: review.accepted, working: review.checking },
+                { label: "功能检查完成", done: finalCheckReady, working: review.checking || (deliveryReady && teamWorking) },
+              ].map((item) => <span className={item.done ? "done" : item.working ? "working" : "waiting"} key={item.label}><i aria-hidden="true">{item.done ? "✓" : item.working ? "•" : "○"}</i>{item.label}<small>{item.done ? "已完成" : item.working ? "进行中" : "待检查"}</small></span>)}
+            </div>
+            <button type="button" disabled={!previewEntry} onClick={() => previewEntry && showFile(previewEntry.path)} title={previewEntry ? `预览 ${previewEntry.path}` : "生成交付文件后即可预览"}>打开预览 <span aria-hidden="true">↗</span></button>
+          </div>
+        </details>}
         <div className="composer-area">
           {activeExecution?.paused && <div className="composer-paused">
             <span role="status"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5.5 4.5v7m5-7v7" /></svg>上次任务已挂起</span>
@@ -506,6 +588,20 @@ function Workspace({ onRecordsCleared }: { onRecordsCleared: () => void }) {
           {error && <p className="error" role="alert">{error}</p>}
           <form className="composer" onSubmit={send}>
             <textarea aria-label="发送消息" placeholder="给团队发消息…" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.shiftKey) { event.preventDefault(); event.currentTarget.form?.requestSubmit(); } }} rows={2} />
+            <div className="prompt-controls" aria-label="补充页面要求">
+              <details className="prompt-control">
+                <summary className={interfaceStyle ? "selected" : ""}>界面风格{interfaceStyle && <span>{interfaceStyle}</span>}</summary>
+                <div className="prompt-popover"><strong>选择界面风格</strong><small>会作为明确要求发送给团队</small>{interfaceStyles.map((style) => <button type="button" className={interfaceStyle === style ? "active" : ""} onClick={(event) => { setInterfaceStyle(interfaceStyle === style ? "" : style); event.currentTarget.closest("details")?.removeAttribute("open"); }} key={style}>{style}{interfaceStyle === style && <span>✓</span>}</button>)}</div>
+              </details>
+              <details className="prompt-control">
+                <summary className={useScenario ? "selected" : ""}>使用场景{useScenario && <span>{useScenario}</span>}</summary>
+                <div className="prompt-popover"><strong>选择使用场景</strong><small>帮助团队调整内容与信息层级</small>{useScenarios.map((scenario) => <button type="button" className={useScenario === scenario ? "active" : ""} onClick={(event) => { setUseScenario(useScenario === scenario ? "" : scenario); event.currentTarget.closest("details")?.removeAttribute("open"); }} key={scenario}>{scenario}{useScenario === scenario && <span>✓</span>}</button>)}</div>
+              </details>
+              <details className="prompt-control">
+                <summary className={preferences.length ? "selected" : ""}>更多设置{preferences.length > 0 && <span>{preferences.length} 项</span>}</summary>
+                <div className="prompt-popover prompt-popover-wide"><strong>开发偏好</strong><small>可多选，再次点击即可取消</small>{developmentPreferences.map((preference) => <button type="button" className={preferences.includes(preference) ? "active" : ""} onClick={() => setPreferences((current) => current.includes(preference) ? current.filter((item) => item !== preference) : [...current, preference])} key={preference}>{preference}{preferences.includes(preference) && <span>✓</span>}</button>)}</div>
+              </details>
+            </div>
             <div className="composer-bottom">
               <span>Enter 发送 · Shift + Enter 换行</span>
               {canStop ? <button className="composer-submit" type="button" disabled={executionAction !== null} onClick={() => void controlExecution('stop')} aria-label="停止生成" title="停止当前对话的生成、任务和运行进程">

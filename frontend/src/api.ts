@@ -80,6 +80,19 @@ export type ConversationDetail = ConversationSummary & {
   activities: PersistedActivity[];
 };
 
+export type CollaborationRequestStatus = {
+  conversation?: string;
+  recipient?: string;
+  state: string;
+  created?: number;
+  origin_message?: string;
+  verification?: string;
+};
+
+export type CollaborationSnapshot = {
+  request?: CollaborationRequestStatus[];
+};
+
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:17420"
 ).replace(/\/$/, "");
@@ -135,6 +148,10 @@ export async function validateWorkspace(path: string): Promise<string> {
 
 export function listProjects(signal?: AbortSignal): Promise<ProjectSummary[]> {
   return requestJson<ProjectSummary[]>("/api/projects", { signal });
+}
+
+export function getCollaborationSnapshot(projectId: string, signal?: AbortSignal): Promise<CollaborationSnapshot> {
+  return requestJson<CollaborationSnapshot>(`/api/projects/${encodeURIComponent(projectId)}/collaboration`, { signal });
 }
 
 export function createProject(name: string, workspacePath: string): Promise<ProjectSummary> {

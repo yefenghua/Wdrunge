@@ -63,18 +63,18 @@ export default function CollaborationPanel({ project, conversation, onOpen }: { 
   const labels: Record<string, string> = { queued: '排队', running: '执行中', blocked: '等待依赖', review: '待验收', completed: '完成', cancelled: '取消', rejected: '拒绝', failed: '失败' };
   const requests = data.request.filter(r => !r.conversation || r.conversation === conversation);
   const messages = data.message.filter(m => !m.conversation || m.conversation === conversation);
+  const paused = data.settings?.some(s => s.paused) || false;
   return <section className="collaboration-panel chat-collaboration" aria-label="群聊任务与协作">
-    <header><div><strong>任务与协作</strong><small>本段群聊的任务、验收与详细记录</small></div></header>
+    <header className="collaboration-hero"><div><span className="collaboration-hero-icon" aria-hidden="true">◇</span><div><strong>任务与协作</strong><small>{requests.length} 项任务 · {(data.goal || []).filter(g => g.conversation === conversation).length} 个长期目标</small></div></div><span className={`collaboration-schedule-state ${paused ? 'paused' : ''}`}><i />{paused ? '调度已暂停' : '自动调度中'}</span></header>
     {error && <p role="alert">{error}</p>}
-    <div className="collaboration-controls">
-      <button disabled={busy} onClick={() => void act(async () => { const r = await fetch(`${url}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"paused":true}' }); if (!r.ok) throw new Error('暂停失败'); })}>暂停新任务</button>
-      <button disabled={busy} onClick={() => void act(async () => { const r = await fetch(`${url}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"paused":false}' }); if (!r.ok) throw new Error('恢复失败'); })}>恢复调度</button>
+    <div className="collaboration-controls collaboration-schedule-controls" role="group" aria-label="任务调度">
+      <button disabled={busy || paused} onClick={() => void act(async () => { const r = await fetch(`${url}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"paused":true}' }); if (!r.ok) throw new Error('暂停失败'); })}><span aria-hidden="true">Ⅱ</span> 暂停</button>
+      <button disabled={busy || !paused} onClick={() => void act(async () => { const r = await fetch(`${url}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{"paused":false}' }); if (!r.ok) throw new Error('恢复失败'); })}><span aria-hidden="true">▶</span> 继续</button>
     </div>
-    {data.settings?.some(s => s.paused) && <p className="collaboration-empty">调度已暂停</p>}
     <GoalPanel goals={(data.goal || []).filter(g => g.conversation === conversation)} tasks={requests} busy={busy} command={command} act={act} />
-    <h3>协作请求</h3>
+    <h3>协作请求 <span>{requests.length}</span></h3>
     {!requests.length && <p className="collaboration-empty">暂无请求</p>}
-    {[...requests].reverse().map(r => <article className="collaboration-request" key={r.id} id={`request-${r.id}`}><div><strong>{memberName(r.sender)} → {memberName(r.recipient)}</strong><span>{labels[r.state] || r.state}</span></div><p>{r.summary || "协作任务"}</p><details className="collaboration-details"><summary>任务详情与交付说明</summary><p>{r.goal}</p>{r.result && <MessageContent message={{ id: r.id, sender: r.recipient, content: r.result }} />}</details>{(() => { const j = data.journal?.find(item => item.request === r.id); return j && (j.attempts.length > 0 || j.notes.length > 0 || j.facts) ? <details className="collaboration-details"><summary>工作记录（{j.attempts.length} 次执行）</summary>
+    {[...requests].reverse().map(r => <article className={`collaboration-request state-${r.state}`} key={r.id} id={`request-${r.id}`}><div><strong>{memberName(r.sender)} <i aria-hidden="true">→</i> {memberName(r.recipient)}</strong><span>{labels[r.state] || r.state}</span></div><p>{r.summary || "协作任务"}</p><details className="collaboration-details"><summary>任务详情与交付说明</summary><p>{r.goal}</p>{r.result && <MessageContent message={{ id: r.id, sender: r.recipient, content: r.result }} />}</details>{(() => { const j = data.journal?.find(item => item.request === r.id); return j && (j.attempts.length > 0 || j.notes.length > 0 || j.facts) ? <details className="collaboration-details"><summary>工作记录（{j.attempts.length} 次执行）</summary>
       {j.attempts.map(a => <p key={a.attempt + (a.mode || '')}>第 {a.attempt} 次 · {a.mode === 'continue' ? '续跑' : '新上下文'} · {outcomeLabels[a.outcome || ''] || a.outcome || '进行中'}{a.reason ? `：${a.reason}` : ''}</p>)}
       {j.last_failure && <p role="status">最近工具失败：{j.last_failure.tool} [{j.last_failure.code || 'error'}] {j.last_failure.error}</p>}
       {j.notes.map((n, i) => <p key={i}><strong>[{n.kind}]</strong> {n.text}</p>)}

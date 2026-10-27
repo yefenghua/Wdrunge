@@ -10,7 +10,7 @@ import { advanceWork } from "./WorkAnimation";
 import { createOfficeCharacter } from "./OfficeCharacter";
 import { actionDurations, actionNames, type CharacterAction } from "./CharacterBehavior";
 import { resolveReview, reviewActions, type CharacterReview, type CharacterReviews } from "./CharacterReview";
-import { createOfficeClock, dayDurationMinutes, formatOfficeTime, normalizeHour, sampleDaylight } from "./OfficeDaylight";
+import { createOfficeClock, dayDurationMinutes, formatOfficeTime, localClockHour, normalizeHour, sampleDaylight } from "./OfficeDaylight";
 import type { TeamMember } from "./api";
 import { box, createDeskModel, cylinder, deskDetails, material, type DeskRole } from "./DeskScene";
 
@@ -156,9 +156,10 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
   const [unavailable, setUnavailable] = useState(false);
   const [generation, setGeneration] = useState(0);
   const [clockOpen, setClockOpen] = useState(false);
-  const [clockHour, setClockHour] = useState(10);
+  const [clockHour, setClockHour] = useState(() => localClockHour());
+  const [followSystemTime, setFollowSystemTime] = useState(true);
   const [dayPlaying, setDayPlaying] = useState(false);
-  const daylightRef = useRef({ hour: 10, playing: false });
+  const daylightRef = useRef({ hour: localClockHour(), playing: false, system: true });
   const clockControlRef = useRef<HTMLDivElement>(null);
   const [selectedRole, setSelectedRole] = useState<DeskRole | null>(null);
   const selectedRoleRef = useRef<DeskRole | null>(null);
@@ -185,17 +186,32 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
     stageRef.current?.querySelector<HTMLButtonElement>(`[data-station="${selectedRole}"]`)?.focus({ preventScroll: true });
   }
   function changeTime(hour: number) {
-    daylightRef.current.hour = normalizeHour(hour); daylightRef.current.playing = false;
-    setClockHour(daylightRef.current.hour); setDayPlaying(false); invalidateRef.current();
+    daylightRef.current.hour = normalizeHour(hour); daylightRef.current.playing = false; daylightRef.current.system = false;
+    setClockHour(daylightRef.current.hour); setDayPlaying(false); setFollowSystemTime(false); invalidateRef.current();
   }
   function toggleDay() {
+    daylightRef.current.system = false;
     daylightRef.current.playing = !daylightRef.current.playing;
-    setDayPlaying(daylightRef.current.playing); invalidateRef.current();
+    setFollowSystemTime(false); setDayPlaying(daylightRef.current.playing); invalidateRef.current();
+  }
+  function useSystemTime() {
+    daylightRef.current.hour = localClockHour(); daylightRef.current.playing = false; daylightRef.current.system = true;
+    setClockHour(daylightRef.current.hour); setDayPlaying(false); setFollowSystemTime(true); invalidateRef.current();
   }
 
   useEffect(() => { agentsRef.current = agents; invalidateRef.current(); }, [agents]);
   useEffect(() => { animationRef.current = animate; invalidateRef.current(); }, [animate]);
   useEffect(() => { previewRef.current = { actionOverride, poseTime }; invalidateRef.current(); }, [actionOverride, poseTime]);
+  useEffect(() => {
+    const synchronize = () => {
+      if (!daylightRef.current.system) return;
+      daylightRef.current.hour = localClockHour();
+      setClockHour(daylightRef.current.hour);
+      invalidateRef.current();
+    };
+    const timer = window.setInterval(synchronize, 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   useEffect(() => {
     selectedRoleRef.current = selectedRole;
     if (!selectedRole) return;
@@ -265,7 +281,7 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
     let chromeAnimating = false;
     const labelPalette = [0xf9faf6, 0xbfc2c1, 0x26364b].map(color => new THREE.Color(color));
     const inkPalette = [0x596459, 0x51575c, 0xc3cdd8].map(color => new THREE.Color(color));
-    const clockPalette = [0x5c675f, 0x858a8c, 0xc2ccda].map(color => new THREE.Color(color));
+    const clockPalette = [0x303b48, 0x58616d, 0xe3e9f3].map(color => new THREE.Color(color));
     const daySky = new THREE.Color(0xf8fafb), nightSky = new THREE.Color(0x91a9d2);
     const dawnSun = new THREE.Color(0xffba78), noonSun = new THREE.Color(0xfff5e7);
 
@@ -295,7 +311,10 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
         let changed = forcePaint;
         const delta = lastSimulation ? Math.min((now - lastSimulation) / 1000, .1) : 0;
         lastSimulation = now;
-        if (dayMotion) {
+        if (daylightRef.current.system && (forcePaint || now - lastClockDisplay >= 1000)) {
+          daylightRef.current.hour = localClockHour();
+          setClockHour(daylightRef.current.hour); lastClockDisplay = now; changed = true;
+        } else if (dayMotion) {
           daylightRef.current.hour = normalizeHour(daylightRef.current.hour + delta * 24 / (dayDurationMinutes * 60));
           if (now - lastClockDisplay > 200) { setClockHour(daylightRef.current.hour); lastClockDisplay = now; }
           changed = true;
@@ -430,14 +449,15 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
       <p>{reviews[selectedRole] ? reviews[selectedRole]!.playing ? "当前动作循环播放 · 拖动进度可定格" : "已暂停 · 拖动进度检查动作细节" : "根据真实状态与时间自然切换动作"}</p>
     </div>}
     {!unavailable && <div className="office-clock-control" ref={clockControlRef} onKeyDown={(event) => { if (event.key === "Escape") { setClockOpen(false); clockControlRef.current?.querySelector("button")?.focus(); } }}>
-      <button className="office-clock-hit" aria-label={`模拟时钟 ${formatOfficeTime(clockHour)}，调整光线`} aria-expanded={clockOpen} onClick={() => setClockOpen(!clockOpen)} title="点击时钟，调整一天的光线"><span>{formatOfficeTime(clockHour)}</span></button>
-      {clockOpen && <div className="office-clock-popover" role="group" aria-label="模拟时间与光照">
-        <div className="office-clock-heading"><label htmlFor="office-time">模拟时间</label><button aria-label="关闭时钟设置" onClick={() => setClockOpen(false)}>×</button></div>
+      <button className="office-clock-hit" aria-label={`${followSystemTime ? "系统" : "模拟"}时钟 ${formatOfficeTime(clockHour)}，调整光线`} aria-expanded={clockOpen} onClick={() => setClockOpen(!clockOpen)} title="点击时钟，调整一天的光线"><span>{formatOfficeTime(clockHour)}</span></button>
+      {clockOpen && <div className="office-clock-popover" role="group" aria-label="时间与光照">
+        <div className="office-clock-heading"><label htmlFor="office-time">{followSystemTime ? "系统时间" : "模拟时间"}</label><button aria-label="关闭时钟设置" onClick={() => setClockOpen(false)}>×</button></div>
+        <button className="office-clock-system" aria-pressed={followSystemTime} onClick={useSystemTime}>{followSystemTime ? "✓ 正在跟随系统时间" : "跟随系统时间"}</button>
         <input id="office-time" aria-label="模拟时间" type="time" value={formatOfficeTime(clockHour)} onChange={(event) => { if (event.target.value) { const [h, m] = event.target.value.split(":").map(Number); changeTime(h + m / 60); } }} />
         <input aria-label="一天的时间" type="range" min="0" max="1439" step="1" value={Math.floor(normalizeHour(clockHour) * 60)} onChange={(event) => changeTime(Number(event.target.value) / 60)} />
         <div className="office-clock-presets">{[[6.5, "清晨"], [12, "正午"], [17.5, "傍晚"], [22, "夜晚"]].map(([hour, label]) => <button key={hour} onClick={() => changeTime(Number(hour))}>{label}</button>)}</div>
         <button className="office-day-play" aria-pressed={dayPlaying} onClick={toggleDay}>{dayPlaying ? "暂停时间" : "播放一天"}</button>
-        <small>{dayDurationMinutes} 分钟走过一天 · 拖动可定格</small>
+        <small>{followSystemTime ? "钟表与场景光线会随电脑时间自动变化" : `${dayDurationMinutes} 分钟走过一天 · 拖动可定格`}</small>
       </div>}
     </div>}
     {unavailable && <div className="scene-fallback" role="status"><strong>暂时无法显示 3D 办公室</strong><p>请重试以恢复画面，团队对话仍可正常使用。</p><button onClick={() => setGeneration((value) => value + 1)}>重新加载场景</button><ul>{stations.map(({ role }) => <li key={role}>{deskDetails[role].name} · {deskDetails[role].label}</li>)}</ul></div>}

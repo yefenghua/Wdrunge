@@ -2,8 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { renderToStaticMarkup } from 'react-dom/server';
 import MessageContent from '../src/MessageContent';
+import { requestsForTurn, reviewProgress } from '../src/DeliveryProgress';
 
 const render = (content: string, extra = {}) => renderToStaticMarkup(<MessageContent message={{ id: 'message', sender: 'leader', content, ...extra }} />);
+
+test('delivery progress follows accepted collaboration requests from the current user turn', () => {
+  const requests = requestsForTurn([
+    { conversation: 'chat', origin_message: 'old', created: 1, recipient: 'testing', state: 'completed' },
+    { conversation: 'chat', origin_message: 'current', created: 2, recipient: 'frontend', state: 'completed' },
+    { conversation: 'chat', origin_message: 'current', created: 3, recipient: 'testing', verification: 'end_to_end', state: 'completed' },
+  ], 'chat', 'current', 1_500);
+  assert.equal(requests.length, 2);
+  assert.deepEqual(reviewProgress(requests, false, false), { checking: false, accepted: true });
+});
+
+test('delivery progress does not treat an unfinished or cancelled-only batch as accepted', () => {
+  assert.deepEqual(reviewProgress([{ state: 'review', recipient: 'testing' }], false, false), { checking: true, accepted: false });
+  assert.deepEqual(reviewProgress([{ state: 'cancelled', recipient: 'frontend' }], false, false), { checking: false, accepted: false });
+});
 
 test('renders delivery documents with headings, lists, GFM tables, tasks, links and code', () => {
   const html = render('# 交付材料\n\n**已完成**，~~旧方案~~\n\n- [x] 接口对接\n- [ ] 联调\n\n| 文件 | 状态 |\n| --- | --- |\n| App.tsx | 完成 |\n\n> 注意兼容性\n\n[文档](https://example.com)\n\n```ts\nconst element = "<div>";\n```');

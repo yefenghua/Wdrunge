@@ -3,6 +3,9 @@ import { box, cylinder, material } from "./DeskScene";
 
 export const dayDurationMinutes = 15;
 export const normalizeHour = (hour: number) => ((hour % 24) + 24) % 24;
+export function localClockHour(value = new Date()) {
+  return value.getHours() + value.getMinutes() / 60 + value.getSeconds() / 3600 + value.getMilliseconds() / 3_600_000;
+}
 export function formatOfficeTime(hour: number) {
   const minutes = Math.floor(normalizeHour(hour) * 60 + 1e-6) % 1440;
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;

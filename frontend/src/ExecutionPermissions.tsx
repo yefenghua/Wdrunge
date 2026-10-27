@@ -96,13 +96,20 @@ export default function ExecutionPermissions() {
     void configureSettings({ ...state.settings, whitelist });
   }
   return <>
-    <button className={`execution-trigger${state?.settings?.allow_all ? ' allow-all' : ''}`} onClick={() => setOpened(true)}>执行权限{state?.settings?.allow_all ? ' · 全部允许' : ''}{pendingCount > 0 ? ` · ${pendingCount} 待确认` : ''}</button>
+    <button className={`execution-trigger${state?.settings?.allow_all ? ' allow-all' : ''}`} onClick={() => setOpened(true)}>
+      <span className="execution-trigger-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M10 2.5 16 5v4.2c0 3.9-2.4 6.8-6 8.3-3.6-1.5-6-4.4-6-8.3V5l6-2.5Z" /><path d="m7.5 10 1.7 1.7 3.5-4" /></svg></span>
+      <span className="execution-trigger-copy"><strong>执行权限</strong><small>{state?.settings?.allow_all ? '当前允许全部操作' : pendingCount > 0 ? `${pendingCount} 个操作待确认` : '管理命令与服务'}</small></span>
+      {pendingCount > 0 && <span className="execution-trigger-badge" aria-hidden="true">{pendingCount}</span>}
+    </button>
     <dialog ref={dialog} className="execution-dialog" onCancel={event => { if (pending) event.preventDefault(); else setOpened(false); }} aria-labelledby="execution-title">
-      <h2 id="execution-title">{pending ? '需要你允许这次操作' : '执行权限与服务'}</h2>
-      {(!token || error.includes('失效')) && <form onSubmit={async event => { event.preventDefault(); if (isTauri()) { try { setToken(await invoke<string>('execution_control_token')); } catch { setError('后端尚未准备好，请确认服务已启动。'); } } else setToken(draft.trim()); }}>
-        <p>授权通道与 Agent 分开，防止命令替自己点击允许。</p>
-        {!isTauri() && <><p>请从本机应用数据目录的 Wdrunge/execution-token 文件复制授权码。macOS 位于 ~/Library/Application Support/Wdrunge/。</p><label>本机授权码<input type="password" autoComplete="off" value={draft} onChange={e => setDraft(e.target.value)} /></label></>}
-        <button type="submit">连接执行授权</button>
+      <header className="execution-dialog-heading">
+        <span className="execution-dialog-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3 20 6.2v5.4c0 5-3.2 8.7-8 10.4-4.8-1.7-8-5.4-8-10.4V6.2L12 3Z" /><path d="m8.8 12 2.1 2.1 4.5-5" /></svg></span>
+        <div><small>安全控制</small><h2 id="execution-title">{pending ? '需要你允许这次操作' : '执行权限与服务'}</h2></div>
+      </header>
+      {(!token || error.includes('失效')) && <form className="execution-connect" onSubmit={async event => { event.preventDefault(); if (isTauri()) { try { setToken(await invoke<string>('execution_control_token')); } catch { setError('后端尚未准备好，请确认服务已启动。'); } } else setToken(draft.trim()); }}>
+        <p className="execution-lead">授权通道与 Agent 分开，防止命令替自己点击允许。</p>
+        {!isTauri() && <><p>请从本机应用数据目录的 Wdrunge/execution-token 文件复制授权码。macOS 位于 ~/Library/Application Support/Wdrunge/。</p><label className="execution-field"><span>本机授权码</span><input type="password" autoComplete="off" value={draft} onChange={e => setDraft(e.target.value)} placeholder="粘贴本机授权码" /></label></>}
+        <button className="execution-primary" type="submit">连接执行授权</button>
       </form>}
       {state && <p className="sandbox-status">{state.sandbox.backend || '沙箱不可用'} · {state.sandbox.detail}</p>}
       {state?.settings && <details className="approval-settings">
@@ -133,7 +140,7 @@ export default function ExecutionPermissions() {
       {error.includes('失效') && pendingCount > 0 && <p role="status">有 {pendingCount} 个操作等待确认，但授权连接已失效，重新连接后才能查看和处理。</p>}
       {!!state?.grants.length && <details><summary>已保存的授权（{state.grants.length}）</summary><p>这些具体操作已加入项目白名单，下次匹配时免审批。</p>{state.grants.map(grant => <section key={grant.id}><p>{grant.scope}</p><pre>{JSON.stringify(grant.operation, null, 2)}</pre><button disabled={busy} onClick={() => void mutate(`grants/${grant.id}/revoke`)}>撤销授权</button></section>)}</details>}
       {!!jobs.length && <details><summary>任务进程（{jobs.length}）</summary>{jobs.map(job => <section key={job.id}><p>{job.name} · {job.state} {job.exit_code !== null ? `(${job.exit_code})` : ''}</p><small>{job.cwd}</small>{job.state === 'running' && <button disabled={busy} onClick={() => void mutate(`processes/${job.id}/stop`)}>停止服务</button>}</section>)}</details>}
-      {error && <p role="alert">{error}</p>}
+      {error && <p className="execution-error" role="alert">{error}</p>}
       {!pending && <button className="execution-close" onClick={() => setOpened(false)}>关闭</button>}
     </dialog>
   </>;
