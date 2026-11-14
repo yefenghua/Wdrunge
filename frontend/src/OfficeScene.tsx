@@ -13,6 +13,7 @@ import { resolveReview, reviewActions, type CharacterReview, type CharacterRevie
 import { createOfficeClock, dayDurationMinutes, formatOfficeTime, localClockHour, normalizeHour, sampleDaylight } from "./OfficeDaylight";
 import type { TeamMember } from "./api";
 import { box, createDeskModel, cylinder, deskDetails, material, type DeskRole } from "./DeskScene";
+import { teamIdentities } from "./TeamIdentity";
 
 // All desks face the same direction. A 2.0 m centre aisle and 2.4 m clear
 // cross-aisles keep both the physical layout and its orthographic projection open.
@@ -279,9 +280,9 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
     let lastReviewDisplay = 0;
     let labelNight = sampleDaylight(daylightRef.current.hour).night;
     let chromeAnimating = false;
-    const labelPalette = [0xf9faf6, 0xbfc2c1, 0x26364b].map(color => new THREE.Color(color));
-    const inkPalette = [0x596459, 0x51575c, 0xc3cdd8].map(color => new THREE.Color(color));
-    const clockPalette = [0x303b48, 0x58616d, 0xe3e9f3].map(color => new THREE.Color(color));
+    const labelPalette = [0xf8f5ef, 0xd7dfe2, 0x343e43].map(color => new THREE.Color(color));
+    const inkPalette = [0x5e504a, 0x4d413c, 0xf4f7e7].map(color => new THREE.Color(color));
+    const clockPalette = [0x4d413c, 0x4d413c, 0xf4f7e7].map(color => new THREE.Color(color));
     const daySky = new THREE.Color(0xf8fafb), nightSky = new THREE.Color(0x91a9d2);
     const dawnSun = new THREE.Color(0xffba78), noonSun = new THREE.Color(0xfff5e7);
 
@@ -424,42 +425,42 @@ export default function OfficeScene({ agents, animate = true, actionOverride = n
     };
   }, [generation]);
 
-  return <div className={`office-scene${unavailable ? " is-unavailable" : ""}`} ref={stageRef} aria-label="后方俯视的三维办公室，两列三排角色工位，中央与横向通道保持畅通">
-    <div className="office-scene-render" ref={renderRef} role="img" aria-label="Leader 宽屏、产品笔记本、美工绘图板、前端双屏、后端三屏、测试多设备工位" />
+  return <div className={`office-scene${unavailable ? " is-unavailable" : ""}`} ref={stageRef} aria-label="Rear overhead view of the 3D office with six workstations in two columns and clear aisles">
+    <div className="office-scene-render" ref={renderRef} role="img" aria-label="Leader ultrawide monitor, Product laptop, Design tablet, Frontend dual monitors, Backend triple monitors, Testing devices" />
     {!unavailable && stations.map(({ role }) => {
       const actualState = agents.find((agent) => agent.id === role)?.status ?? "idle";
       const status = resolveReview(role, actualState === "waiting" ? "idle" : actualState, reviews[role]).state;
-      return <button type="button" className={`station-label ${status}${reviews[role] ? " is-manual" : ""}`} data-station={role} key={role} title={`${deskDetails[role].label} · 点击选择动作`} aria-label={`${deskDetails[role].name}，选择动作`} aria-expanded={selectedRole === role} onClick={() => openReview(role)}>
-        <span>{deskDetails[role].name}</span><i aria-label={status === "running" ? "工作中" : status === "failed" ? "需要关注" : actualState === "waiting" ? "等待消息" : "待命"} />{reviews[role] ? <small>手动</small> : actualState === "waiting" && <small>等待消息</small>}
+      return <button type="button" className={`station-label ${status}${reviews[role] ? " is-manual" : ""}`} data-station={role} key={role} title={`${deskDetails[role].name} · ${deskDetails[role].label} · Choose an action`} aria-label={`Choose an action for ${deskDetails[role].name}`} aria-expanded={selectedRole === role} onClick={() => openReview(role)}>
+        <span>{teamIdentities[role].name}</span><i aria-label={status === "running" ? "Working" : status === "failed" ? "Needs attention" : actualState === "waiting" ? "Waiting for a message" : "Idle"} />{reviews[role] ? <small>Manual</small> : actualState === "waiting" && <small>Waiting</small>}
       </button>;
     })}
-    {!unavailable && selectedRole && <div className={`character-review${stations.find(station => station.role === selectedRole)!.x > 0 ? " is-left" : ""}`} ref={reviewCardRef} role="dialog" aria-label={`${deskDetails[selectedRole].name}动作验收`} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeReview(); } }}>
-      <div className="character-review-heading"><div><strong>{deskDetails[selectedRole].name}</strong><span>动作验收</span></div><button aria-label="关闭动作卡片" onClick={closeReview}>×</button></div>
-      <button ref={reviewActionRef} className="character-review-auto" aria-pressed={!reviews[selectedRole]} onClick={() => editReview(selectedRole, null)}>跟随真实状态</button>
-      <div className="character-review-actions">{reviewActions(selectedRole).map(action => <button key={action} aria-pressed={reviews[selectedRole]?.action === action} onClick={() => editReview(selectedRole, { action, playing: true, time: 0 })}>{action === "gaming" ? "打游戏" : actionNames[action]}</button>)}</div>
+    {!unavailable && selectedRole && <div className={`character-review${stations.find(station => station.role === selectedRole)!.x > 0 ? " is-left" : ""}`} ref={reviewCardRef} role="dialog" aria-label={`Action preview for ${deskDetails[selectedRole].name}`} onKeyDown={event => { if (event.key === "Escape") { event.stopPropagation(); closeReview(); } }}>
+      <div className="character-review-heading"><div><strong>{deskDetails[selectedRole].name}</strong><span>Action preview</span></div><button aria-label="Close action preview" onClick={closeReview}>×</button></div>
+      <button ref={reviewActionRef} className="character-review-auto" aria-pressed={!reviews[selectedRole]} onClick={() => editReview(selectedRole, null)}>Follow live status</button>
+      <div className="character-review-actions">{reviewActions(selectedRole).map(action => <button key={action} aria-pressed={reviews[selectedRole]?.action === action} onClick={() => editReview(selectedRole, { action, playing: true, time: 0 })}>{action === "gaming" ? "Game" : actionNames[action]}</button>)}</div>
       {reviews[selectedRole] && <>
         <div className="character-review-playback">
-          <button onClick={() => { const review = reviews[selectedRole]!; editReview(selectedRole, { ...review, playing: !review.playing, time: reviewTimesRef.current[selectedRole] ?? 0 }); }}>{reviews[selectedRole]!.playing ? "暂停动作" : "播放动作"}</button>
-          <button onClick={() => editReview(selectedRole, { ...reviews[selectedRole]!, playing: true, time: 0 })}>从头播放</button>
+          <button onClick={() => { const review = reviews[selectedRole]!; editReview(selectedRole, { ...review, playing: !review.playing, time: reviewTimesRef.current[selectedRole] ?? 0 }); }}>{reviews[selectedRole]!.playing ? "Pause" : "Play"}</button>
+          <button onClick={() => editReview(selectedRole, { ...reviews[selectedRole]!, playing: true, time: 0 })}>Restart</button>
         </div>
-        <label className="character-review-timeline">动作进度 <output aria-live="off">{(reviewTime % actionDurations[reviews[selectedRole]!.action]).toFixed(1)} / {actionDurations[reviews[selectedRole]!.action]} 秒</output>
-          <input aria-label="动作进度" type="range" min="0" max={actionDurations[reviews[selectedRole]!.action] - .01} step="0.01" value={reviewTime % actionDurations[reviews[selectedRole]!.action]} onChange={event => editReview(selectedRole, { ...reviews[selectedRole]!, playing: false, time: Number(event.target.value) })} />
+        <label className="character-review-timeline">Action timeline <output aria-live="off">{(reviewTime % actionDurations[reviews[selectedRole]!.action]).toFixed(1)} / {actionDurations[reviews[selectedRole]!.action]} s</output>
+          <input aria-label="Action timeline" type="range" min="0" max={actionDurations[reviews[selectedRole]!.action] - .01} step="0.01" value={reviewTime % actionDurations[reviews[selectedRole]!.action]} onChange={event => editReview(selectedRole, { ...reviews[selectedRole]!, playing: false, time: Number(event.target.value) })} />
         </label>
       </>}
-      <p>{reviews[selectedRole] ? reviews[selectedRole]!.playing ? "当前动作循环播放 · 拖动进度可定格" : "已暂停 · 拖动进度检查动作细节" : "根据真实状态与时间自然切换动作"}</p>
+      <p>{reviews[selectedRole] ? reviews[selectedRole]!.playing ? "Playing on a loop · Drag the timeline to pause" : "Paused · Drag the timeline to inspect the action" : "Actions follow live status and time of day"}</p>
     </div>}
     {!unavailable && <div className="office-clock-control" ref={clockControlRef} onKeyDown={(event) => { if (event.key === "Escape") { setClockOpen(false); clockControlRef.current?.querySelector("button")?.focus(); } }}>
-      <button className="office-clock-hit" aria-label={`${followSystemTime ? "系统" : "模拟"}时钟 ${formatOfficeTime(clockHour)}，调整光线`} aria-expanded={clockOpen} onClick={() => setClockOpen(!clockOpen)} title="点击时钟，调整一天的光线"><span>{formatOfficeTime(clockHour)}</span></button>
-      {clockOpen && <div className="office-clock-popover" role="group" aria-label="时间与光照">
-        <div className="office-clock-heading"><label htmlFor="office-time">{followSystemTime ? "系统时间" : "模拟时间"}</label><button aria-label="关闭时钟设置" onClick={() => setClockOpen(false)}>×</button></div>
-        <button className="office-clock-system" aria-pressed={followSystemTime} onClick={useSystemTime}>{followSystemTime ? "✓ 正在跟随系统时间" : "跟随系统时间"}</button>
-        <input id="office-time" aria-label="模拟时间" type="time" value={formatOfficeTime(clockHour)} onChange={(event) => { if (event.target.value) { const [h, m] = event.target.value.split(":").map(Number); changeTime(h + m / 60); } }} />
-        <input aria-label="一天的时间" type="range" min="0" max="1439" step="1" value={Math.floor(normalizeHour(clockHour) * 60)} onChange={(event) => changeTime(Number(event.target.value) / 60)} />
-        <div className="office-clock-presets">{[[6.5, "清晨"], [12, "正午"], [17.5, "傍晚"], [22, "夜晚"]].map(([hour, label]) => <button key={hour} onClick={() => changeTime(Number(hour))}>{label}</button>)}</div>
-        <button className="office-day-play" aria-pressed={dayPlaying} onClick={toggleDay}>{dayPlaying ? "暂停时间" : "播放一天"}</button>
-        <small>{followSystemTime ? "钟表与场景光线会随电脑时间自动变化" : `${dayDurationMinutes} 分钟走过一天 · 拖动可定格`}</small>
+      <button className="office-clock-hit" aria-label={`${followSystemTime ? "System" : "Simulated"} clock ${formatOfficeTime(clockHour)}. Adjust lighting.`} aria-expanded={clockOpen} onClick={() => setClockOpen(!clockOpen)} title="Adjust time and lighting"><span>{formatOfficeTime(clockHour)}</span></button>
+      {clockOpen && <div className="office-clock-popover" role="group" aria-label="Time and lighting">
+        <div className="office-clock-heading"><label htmlFor="office-time">{followSystemTime ? "System time" : "Simulated time"}</label><button aria-label="Close clock settings" onClick={() => setClockOpen(false)}>×</button></div>
+        <button className="office-clock-system" aria-pressed={followSystemTime} onClick={useSystemTime}>{followSystemTime ? "✓ Using system time" : "Use system time"}</button>
+        <input id="office-time" aria-label="Simulated time" type="time" value={formatOfficeTime(clockHour)} onChange={(event) => { if (event.target.value) { const [h, m] = event.target.value.split(":").map(Number); changeTime(h + m / 60); } }} />
+        <input aria-label="Time of day" type="range" min="0" max="1439" step="1" value={Math.floor(normalizeHour(clockHour) * 60)} onChange={(event) => changeTime(Number(event.target.value) / 60)} />
+        <div className="office-clock-presets">{[[6.5, "Dawn"], [12, "Noon"], [17.5, "Dusk"], [22, "Night"]].map(([hour, label]) => <button key={hour} onClick={() => changeTime(Number(hour))}>{label}</button>)}</div>
+        <button className="office-day-play" aria-pressed={dayPlaying} onClick={toggleDay}>{dayPlaying ? "Pause" : "Play a day"}</button>
+        <small>{followSystemTime ? "The clock and lighting follow your computer time" : `${dayDurationMinutes} min per day · Drag to pause`}</small>
       </div>}
     </div>}
-    {unavailable && <div className="scene-fallback" role="status"><strong>暂时无法显示 3D 办公室</strong><p>请重试以恢复画面，团队对话仍可正常使用。</p><button onClick={() => setGeneration((value) => value + 1)}>重新加载场景</button><ul>{stations.map(({ role }) => <li key={role}>{deskDetails[role].name} · {deskDetails[role].label}</li>)}</ul></div>}
+    {unavailable && <div className="scene-fallback" role="status"><strong>3D office unavailable</strong><p>Retry to restore the scene. You can still use team chat.</p><button onClick={() => setGeneration((value) => value + 1)}>Reload scene</button><ul>{stations.map(({ role }) => <li key={role}>{deskDetails[role].name} · {deskDetails[role].label}</li>)}</ul></div>}
   </div>;
 }

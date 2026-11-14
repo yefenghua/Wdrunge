@@ -1,43 +1,43 @@
-.context-agents { display: grid; flex: none; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; padding: 12px 14px; border-bottom: 1px solid #f0f0f0; }
-.context-agents button { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; padding: 6px 2px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #666; font-size: 10px; }
-.context-agents button > span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.context-agents button:hover { background: #f6f6f6; }
-.context-agents button.active { border-color: #ddd; background: #f3f3f3; color: #222; font-weight: 700; }
+.context-agents { display: grid; flex: none; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; padding: 12px 14px; border-bottom: 1px solid var(--palette-border); }
+.context-agents button { display: flex; flex-direction: column; align-items: center; gap: 5px; min-width: 0; padding: 6px 2px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: var(--palette-muted); font-size: 10px; }
+.context-agents button > span:last-child { max-width: 100%; overflow-wrap: anywhere; line-height: 1.25; }
+.context-agents button:hover { background: var(--palette-hover); }
+.context-agents button.active { border-color: var(--palette-border); background: var(--palette-mist); color: var(--palette-ink); font-weight: 700; }
 .context-agents button.empty { opacity: .45; }
 .context-agent-avatar { position: relative; display: inline-flex; }
-.context-agent-avatar i { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid #fff; border-radius: 50%; background: #2f8f5b; }
+.context-agent-avatar i { position: absolute; right: -2px; bottom: -2px; width: 9px; height: 9px; border: 2px solid var(--palette-paper); border-radius: 50%; background: #2f8f5b; }
 .context-heading-row { min-height: 56px; }
-.context-picker { display: flex; flex: none; align-items: center; gap: 8px; padding: 8px 21px; border-bottom: 1px solid #f0f0f0; color: #888; font-size: 10px; }
-.context-picker select { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid #ddd; border-radius: 6px; background: #fff; color: #333; font-size: 11px; }
+.context-picker { display: flex; flex: none; align-items: center; gap: 8px; padding: 8px 21px; border-bottom: 1px solid var(--palette-border); color: var(--palette-muted); font-size: 10px; }
+.context-picker select { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--palette-border); border-radius: 6px; background: var(--palette-paper); color: var(--palette-ink); font-size: 11px; }
 .context-error { flex: none; margin: 0; padding: 6px 21px; color: #a42e2e; font-size: 11px; }
 .context-feed { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px 26px; }
-.context-message { margin: 0 0 12px; padding: 9px 11px; border: 1px solid #eee; border-radius: 9px; background: #fff; }
-.context-message.system { background: #fafafa; }
-.context-message.human { background: #f7f8fa; }
-.context-message-meta { margin-bottom: 5px; color: #999; font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.context-message { margin: 0 0 12px; padding: 9px 11px; border: 1px solid var(--palette-border); border-radius: 9px; background: var(--palette-paper); }
+.context-message.system { background: var(--palette-panel); }
+.context-message.human { background: var(--palette-selected); }
+.context-message-meta { margin-bottom: 5px; color: var(--palette-muted); font-size: 9px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .agent-context-panel pre { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
-.context-text { color: #333; font-size: 11px; line-height: 1.55; }
+.context-text { color: var(--palette-ink); font-size: 11px; line-height: 1.55; }
 .context-text.clamped { display: block; width: 100%; padding: 0; border: 0; background: transparent; text-align: left; }
 .context-text.clamped pre { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 8; line-clamp: 8; }
-.context-text.clamped:hover pre { color: #111; }
-.context-reasoning { margin-bottom: 6px; color: #888; font-size: 10px; }
+.context-text.clamped:hover pre { color: var(--palette-ink-hover); }
+.context-reasoning { margin-bottom: 6px; color: var(--palette-muted); font-size: 10px; }
 .context-reasoning summary { cursor: pointer; }
 .context-reasoning pre { max-height: 200px; margin-top: 4px; overflow-y: auto; font-size: 10px; }
-.context-tool { display: block; width: 100%; margin-top: 7px; padding: 7px 9px; border: 1px solid #e6e6e6; border-radius: 7px; background: #fbfbfb; color: inherit; text-align: left; }
-.context-tool:hover { border-color: #c9c9c9; background: #f5f5f5; }
+.context-tool { display: block; width: 100%; margin-top: 7px; padding: 7px 9px; border: 1px solid var(--palette-border); border-radius: 7px; background: var(--palette-panel); color: inherit; text-align: left; }
+.context-tool:hover { border-color: var(--palette-sand); background: var(--palette-hover); }
 .context-tool.error { border-left: 3px solid #b43c3c; }
 .context-tool.pending { border-style: dashed; }
 .context-tool-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.context-tool-head code { overflow: hidden; color: #333; font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-.context-status { flex: none; padding: 2px 6px; border-radius: 5px; background: #eee; color: #777; font-size: 9px; }
+.context-tool-head code { overflow: hidden; color: var(--palette-ink); font-size: 11px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.context-status { flex: none; padding: 2px 6px; border-radius: 5px; background: var(--palette-border); color: var(--palette-ink); font-size: 9px; }
 .context-status.error { background: #f7e3e3; color: #a42e2e; }
 .context-status.success { background: #e7f2ea; color: #2f7a4f; }
-.agent-context-panel .context-tool-result { display: -webkit-box; margin-top: 5px; overflow: hidden; color: #666; font-size: 10px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; }
-.context-dialog-backdrop { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 20px; background: #18181888; }
-.context-dialog { display: flex; flex-direction: column; width: min(880px, 100%); max-height: 86dvh; padding: 16px 18px 18px; border: 1px solid #ddd; border-radius: 13px; background: #fff; box-shadow: 0 18px 60px #0003; }
+.agent-context-panel .context-tool-result { display: -webkit-box; margin-top: 5px; overflow: hidden; color: var(--palette-muted); font-size: 10px; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; }
+.context-dialog-backdrop { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 20px; background: #30272280; }
+.context-dialog { display: flex; flex-direction: column; width: min(880px, 100%); max-height: 86dvh; padding: 16px 18px 18px; border: 1px solid var(--palette-border); border-radius: 13px; background: var(--palette-paper); box-shadow: 0 18px 60px #5e504a33; }
 .context-dialog header { display: flex; flex: none; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
 .context-dialog header strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
-.context-dialog header button { width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 7px; background: #fff; color: #555; font-size: 16px; line-height: 1; }
-.context-dialog h3 { display: flex; flex: none; align-items: center; gap: 8px; margin: 10px 0 6px; color: #666; font-size: 11px; }
-.context-dialog-body { flex: 1 1 auto; min-height: 60px; overflow: auto; padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; background: #fafafa; color: #333; font-size: 11px; line-height: 1.55; }
+.context-dialog header button { width: 28px; height: 28px; border: 1px solid var(--palette-border); border-radius: 7px; background: var(--palette-paper); color: var(--palette-ink); font-size: 16px; line-height: 1; }
+.context-dialog h3 { display: flex; flex: none; align-items: center; gap: 8px; margin: 10px 0 6px; color: var(--palette-muted); font-size: 11px; }
+.context-dialog-body { flex: 1 1 auto; min-height: 60px; overflow: auto; padding: 10px 12px; border: 1px solid var(--palette-border); border-radius: 8px; background: var(--palette-panel); color: var(--palette-ink); font-size: 11px; line-height: 1.55; }
 .context-dialog h3 + .context-dialog-body { max-height: 38dvh; }

@@ -1,4 +1,5 @@
 import type { AgentContextListResponse, AgentContextResponse, ConversationUsageResponse, TeamMemberResponse, TeamStatusResponse, TeamUsageResponse } from "./generated";
+import { untitledConversation } from "./conversationTitle";
 
 export type TeamMember = TeamMemberResponse;
 export type TeamUsage = TeamUsageResponse;
@@ -141,8 +142,8 @@ export async function validateWorkspace(path: string): Promise<string> {
     body: JSON.stringify({ path }),
   });
   const data = await response.json() as { path?: string; detail?: string };
-  if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : `工作区校验失败 (${response.status})`);
-  if (!data.path) throw new Error("工作区校验未返回路径");
+  if (!response.ok) throw new Error(typeof data.detail === "string" ? data.detail : `Workspace validation failed (${response.status})`);
+  if (!data.path) throw new Error("Workspace validation did not return a path.");
   return data.path;
 }
 
@@ -166,7 +167,7 @@ export function createConversation(projectId: string): Promise<ConversationSumma
   return requestJson<ConversationSummary>(`/api/projects/${projectId}/conversations`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ title: "新对话" }),
+    body: JSON.stringify({ title: untitledConversation }),
   });
 }
 
@@ -300,15 +301,15 @@ export type ConversationExecution = {
 };
 
 export function executionLabel(state: ConversationExecution | undefined, streaming: boolean): string {
-  if (state?.stopping) return '正在停止任务';
+  if (state?.stopping) return 'Stopping tasks…';
   const tasks = state?.task_states;
-  if (tasks?.running) return `团队正在执行 · ${tasks.running} 项任务`;
-  if (tasks?.review) return `代码已交付 · ${tasks.review} 项待 Leader 验收`;
-  if (tasks?.blocked) return `等待依赖或处理阻塞 · ${tasks.blocked} 项任务`;
-  if (tasks?.queued) return `任务排队中 · ${tasks.queued} 项`;
-  if (state?.leader_running || streaming) return 'Leader 正在处理';
-  if (state?.active_goals) return '等待目标收尾';
-  return '正在同步执行状态';
+  if (tasks?.running) return `Team working · ${tasks.running} active`;
+  if (tasks?.review) return `Code delivered · ${tasks.review} awaiting Leader review`;
+  if (tasks?.blocked) return `Waiting on dependencies or blockers · ${tasks.blocked} blocked`;
+  if (tasks?.queued) return `Tasks queued · ${tasks.queued}`;
+  if (state?.leader_running || streaming) return 'Leader is working';
+  if (state?.active_goals) return 'Waiting for goal completion';
+  return 'Syncing task status…';
 }
 export function getConversationExecution(id: string, signal?: AbortSignal): Promise<ConversationExecution> {
   return requestJson(`/api/conversations/${encodeURIComponent(id)}/execution`, { signal });

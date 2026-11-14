@@ -9,7 +9,7 @@ const hex = (color: number) => `#${color.toString(16).padStart(6, "0")}`;
 export default function AgentAvatar({ agent, className = "" }: { agent: string; className?: string }) {
   const id = useId();
   const appearance = Object.prototype.hasOwnProperty.call(characterAppearance, agent) ? characterAppearance[agent as DeskRole] : undefined;
-  if (!appearance) return <span className={`avatar avatar-user ${className}`} aria-hidden="true">{agent === "user" ? "我" : "·"}</span>;
+  if (!appearance) return <span className={`avatar avatar-user ${className}`} aria-hidden="true">{agent === "user" ? "Y" : "·"}</span>;
 
   const shirt = hex(appearance.shirt), hair = hex(appearance.hair), skin = hex(appearance.skin);
   const { style } = appearance;

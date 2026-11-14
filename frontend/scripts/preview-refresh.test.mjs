@@ -59,9 +59,9 @@ try {
     throw new Error(`Preview did not reach ${expectedColor} / ${expectedScript} after refresh`);
   }
   async function open() {
-    await page.getByLabel('预览网站地址').fill(target);
-    await page.getByRole('button', { name: '打开', exact: true }).click();
-    await page.getByText('已连接，可点选元素', { exact: true }).waitFor();
+    await page.getByLabel('Preview URL').fill(target);
+    await page.getByRole('button', { name: 'Open', exact: true }).click();
+    await page.getByText('Connected — select an element', { exact: true }).waitFor();
     await frame.locator('#title').evaluate(() => new Promise(resolve => {
       const poll = () => window.fixtureBooted ? resolve(true) : setTimeout(poll, 10); poll();
     }));
@@ -76,26 +76,26 @@ try {
   await open();
   assert.equal(await actualColor(), 'rgb(220, 20, 60)', 'the fixture must reproduce stale CSS before testing the fix');
   assert.equal(counts.css, firstCssRequests, 'plain remount must retain the cached stylesheet');
-  await page.getByRole('button', { name: '刷新', exact: true }).click();
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
   await waitForState('rgb(22, 163, 74)', 'two');
-  await page.getByText('已连接，可点选元素', { exact: true }).waitFor();
+  await page.getByText('Connected — select an element', { exact: true }).waitFor();
   assert.equal(await actualColor(), 'rgb(22, 163, 74)');
   assert.equal(await frame.locator('#title').evaluate(() => window.fixtureScriptVersion), 'two');
   assert.ok(counts.css > firstCssRequests, 'refresh must request the new CSS');
   assert.ok(counts.script > 1, 'refresh must request new JS instead of refreshing only the HTML');
-  assert.equal(await page.getByLabel('预览网站地址').inputValue(), target, 'route, query and fragment remain unchanged');
+  assert.equal(await page.getByLabel('Preview URL').inputValue(), target, 'route, query and fragment remain unchanged');
   assert.equal(await frame.locator('#title').evaluate(() => location.href), target);
   assert.equal(counts.unexpectedApiGets, 0, 'resource prefetch must not replay application API requests');
   assert.equal(counts.sideEffects, counts.pageStarts, 'only normal document execution may run the side-effect API');
 
   // A failed CSS reload must be surfaced, and a subsequent refresh must recover.
   brokenStylesheet = true;
-  await page.getByRole('button', { name: '刷新', exact: true }).click();
-  await page.getByRole('alert').filter({ hasText: /刷新|资源|503|样式/ }).first().waitFor({ timeout: 15000 });
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
+  await page.getByRole('alert').filter({ hasText: /refresh|asset|503|stylesheet/i }).first().waitFor({ timeout: 15000 });
   brokenStylesheet = false; color = 'rgb(37, 99, 235)'; scriptVersion = 'three';
-  await page.getByRole('button', { name: '刷新', exact: true }).click();
+  await page.getByRole('button', { name: 'Refresh', exact: true }).click();
   await waitForState('rgb(37, 99, 235)', 'three');
-  await page.getByText('已连接，可点选元素', { exact: true }).waitFor();
+  await page.getByText('Connected — select an element', { exact: true }).waitFor();
   assert.equal(await actualColor(), 'rgb(37, 99, 235)');
   assert.equal(counts.unexpectedApiGets, 0);
   console.log('PASS: cached CSS and JS refresh, route/query/hash preservation, API exclusion, refresh failure and retry');

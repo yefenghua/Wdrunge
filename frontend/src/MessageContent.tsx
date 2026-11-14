@@ -10,8 +10,8 @@ type Message = TeamChatMessage & { read?: boolean; readBy?: string[] };
 const plugins = [remarkGfm, remarkBreaks];
 const components: Components = {
   a: ({ node: _node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-  table: ({ node: _node, ...props }) => <div className="markdown-table" role="region" aria-label="表格，可横向滚动" tabIndex={0}><table {...props} /></div>,
-  pre: ({ node: _node, ...props }) => <pre {...props} tabIndex={0} aria-label="代码块，可横向滚动" />,
+  table: ({ node: _node, ...props }) => <div className="markdown-table" role="region" aria-label="Table, scroll horizontally" tabIndex={0}><table {...props} /></div>,
+  pre: ({ node: _node, ...props }) => <pre {...props} tabIndex={0} aria-label="Code block, scroll horizontally" />,
   img: ({ node: _node, ...props }) => <img {...props} loading="lazy" />,
 };
 
@@ -20,7 +20,7 @@ function Markdown({ children }: { children: string }) {
 }
 
 function Mention({ worker, read }: { worker: string; read: boolean }) {
-  const label = `${memberName(worker)}${read ? "已读" : "未读"}`;
+  const label = `${memberName(worker)} · ${read ? "Read" : "Unread"}`;
   return <span className="mention-token">@{memberName(worker)}<span className={`read-indicator ${read ? "read" : "unread"}`} title={label} aria-label={label} /></span>;
 }
 
@@ -28,7 +28,7 @@ export default function MessageContent({ message }: { message: Message }) {
   const annotations = message.sender === 'user' ? readAnnotationMessage(message.content) : null;
   if (annotations) return <>
     <Markdown>{annotations.requirement}</Markdown>
-    <details className="message-annotations"><summary>{annotations.items.length} 条网页批注</summary>
+    <details className="message-annotations"><summary>{annotations.items.length} site {annotations.items.length === 1 ? 'annotation' : 'annotations'}</summary>
       {annotations.items.map((item, index) => <div key={index}><strong>{index + 1}. {selectionLabel(item.context)}</strong>
         <p>{item.comment}</p><small>{item.context.url}</small></div>)}
     </details>

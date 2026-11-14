@@ -6,7 +6,7 @@ import "./AgentContextPanel.css";
 
 const roles = Object.keys(teamIdentities) as (keyof typeof teamIdentities)[];
 const POLL_MS = 1500;
-const typeLabels: Record<string, string> = { system: "系统提示词", human: "输入", ai: "回复", tool: "工具结果" };
+const typeLabels: Record<string, string> = { system: "System prompt", human: "Input", ai: "Reply", tool: "Tool result" };
 
 type Detail =
   | { kind: "call"; call: AgentContextToolCall; result?: AgentContextMessage }
@@ -20,7 +20,13 @@ function pretty(text: string) {
 }
 
 function contextTime(updated?: number | null) {
-  return updated ? new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(updated * 1000)) : "";
+  return updated ? new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(updated * 1000)) : "";
+}
+
+function contextLabel(item: AgentContextSummary) {
+  if (item.key === "leader") return "Coordination";
+  if (item.key.startsWith("direct:")) return "Direct assignment";
+  return item.label;
 }
 
 export default function AgentContextPanel({ conversation }: { conversation: string }) {
@@ -47,7 +53,7 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
         const data = await listAgentContexts(conversation, abort.signal);
         if (!abort.signal.aborted) { setContexts(data.contexts); setError(""); }
       } catch (cause) {
-        if (!abort.signal.aborted) setError(cause instanceof Error ? cause.message : "无法读取上下文列表");
+        if (!abort.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not load the context list");
       } finally { if (!abort.signal.aborted) timer = setTimeout(poll, POLL_MS); }
     }
     void poll();
@@ -67,7 +73,7 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
         if (!data.unchanged) setMessages(data.messages ?? []);
         revision = data.revision; setLoadedKey(key); setError("");
       } catch (cause) {
-        if (!abort.signal.aborted) setError(cause instanceof Error ? cause.message : "无法读取上下文");
+        if (!abort.signal.aborted) setError(cause instanceof Error ? cause.message : "Could not load the context");
       } finally { if (!abort.signal.aborted) timer = setTimeout(poll, POLL_MS); }
     }
     void poll();
@@ -88,30 +94,30 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
   const results = new Map(messages.filter(m => m.type === "tool" && m.tool_call_id).map(m => [m.tool_call_id!, m]));
   const calls = new Set(messages.flatMap(m => (m.tool_calls ?? []).map(call => call.id)).filter(Boolean));
 
-  return <section className="log-panel agent-context-panel" role="tabpanel" aria-label="Agent 上下文">
-    <div className="context-agents" role="radiogroup" aria-label="选择 Agent">
+  return <section className="log-panel agent-context-panel" role="tabpanel" aria-label="Agent context">
+    <div className="context-agents" role="radiogroup" aria-label="Select an agent">
       {roles.map(role => {
         const count = contexts.filter(item => item.agent === role).length;
         const running = contexts.some(item => item.agent === role && item.running);
         return <button key={role} role="radio" aria-checked={agent === role} className={`${agent === role ? "active" : ""} ${count ? "" : "empty"}`}
-          onClick={() => { setAgent(role); setChosen(null); }} title={`${teamIdentities[role].name}（${teamIdentities[role].role}）· ${count} 个上下文`}>
-          <span className="context-agent-avatar"><AgentAvatar agent={role} />{running && <i aria-label="运行中" />}</span>
+          onClick={() => { setAgent(role); setChosen(null); }} title={`${teamIdentities[role].name} (${teamIdentities[role].role}) · ${count} ${count === 1 ? "context" : "contexts"}`}>
+          <span className="context-agent-avatar"><AgentAvatar agent={role} />{running && <i aria-label="Running" />}</span>
           <span>{teamIdentities[role].name}</span>
         </button>;
       })}
     </div>
     <header className="panel-heading context-heading-row">
       <div>
-        <strong>{teamIdentities[agent as keyof typeof teamIdentities]?.name ?? agent} 的上下文</strong>
-        <span>模型下一次调用看到的内容 · 每 {POLL_MS / 1000} 秒刷新</span>
+        <strong>Context for {teamIdentities[agent as keyof typeof teamIdentities]?.name ?? agent}</strong>
+        <span>What the model sees on its next call · Refreshes every {POLL_MS / 1000}s</span>
       </div>
-      <span className="member-count">{messages.length} 条</span>
+      <span className="member-count">{messages.length} {messages.length === 1 ? "message" : "messages"}</span>
     </header>
     {own.length > 1 && <label className="context-picker">
-      <span>上下文</span>
+      <span>Context</span>
       <select value={selected?.key} onChange={event => setChosen(event.target.value)}>
         {own.map((item, index) => <option key={item.key} value={item.key}>
-          {item.running ? "● " : ""}{item.label}{item.updated ? ` · ${contextTime(item.updated)}` : ""}{index === 0 ? "（最新）" : ""}
+          {item.running ? "● " : ""}{contextLabel(item)}{item.updated ? ` · ${contextTime(item.updated)}` : ""}{index === 0 ? " (latest)" : ""}
         </option>)}
       </select>
     </label>}
@@ -120,9 +126,9 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
       const el = event.currentTarget;
       follow.current = el.scrollHeight - el.clientHeight - el.scrollTop <= 32;
     }}>
-      {!selected ? <div className="activity-empty">该成员在此对话中还没有上下文</div>
-        : loadedKey !== key ? <div className="activity-empty">正在读取…</div>
-        : messages.length === 0 ? <div className="activity-empty">上下文为空</div>
+      {!selected ? <div className="activity-empty">This agent has no context in this conversation yet</div>
+        : loadedKey !== key ? <div className="activity-empty">Loading…</div>
+        : messages.length === 0 ? <div className="activity-empty">No messages in this context</div>
         : messages.map((message, index) => {
           if (message.type === "tool" && message.tool_call_id && calls.has(message.tool_call_id)) return null;
           if (message.type === "tool") return <ToolCard key={message.id ?? index} result={message} onOpen={setDetail}
@@ -130,9 +136,9 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
           const long = message.type === "system" || message.type === "human";
           return <article key={message.id ?? index} className={`context-message ${message.type}`}>
             <div className="context-message-meta">{typeLabels[message.type] ?? message.type}</div>
-            {message.reasoning && <details className="context-reasoning"><summary>思考过程</summary><pre>{message.reasoning}</pre></details>}
+            {message.reasoning && <details className="context-reasoning"><summary>Reasoning</summary><pre>{message.reasoning}</pre></details>}
             {message.content && (long
-              ? <button className="context-text clamped" onClick={() => setDetail({ kind: "text", title: typeLabels[message.type] ?? message.type, text: message.content })} title="查看全文"><pre>{message.content.slice(0, 4000)}</pre></button>
+              ? <button className="context-text clamped" onClick={() => setDetail({ kind: "text", title: typeLabels[message.type] ?? message.type, text: message.content })} title="View full text"><pre>{message.content.slice(0, 4000)}</pre></button>
               : <pre className="context-text">{message.content}</pre>)}
             {(message.tool_calls ?? []).map((call, callIndex) => <ToolCard key={call.id ?? callIndex} call={call}
               result={call.id ? results.get(call.id) : undefined} onOpen={setDetail} />)}
@@ -141,12 +147,12 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
     </div>
     {detail && <div className="context-dialog-backdrop" role="presentation" onClick={event => { if (event.target === event.currentTarget) setDetail(null); }}>
       <section className="context-dialog" role="dialog" aria-modal="true" aria-label={detail.kind === "call" ? detail.call.name : detail.title}>
-        <header><strong>{detail.kind === "call" ? detail.call.name : detail.title}</strong><button autoFocus onClick={() => setDetail(null)} aria-label="关闭">×</button></header>
+        <header><strong>{detail.kind === "call" ? detail.call.name : detail.title}</strong><button autoFocus onClick={() => setDetail(null)} aria-label="Close">×</button></header>
         {detail.kind === "call" ? <>
-          <h3>请求参数</h3>
-          <pre className="context-dialog-body">{detail.call.arguments ? pretty(detail.call.arguments) : "（不可用：调用记录已不在上下文中）"}</pre>
-          <h3>返回结果{detail.result?.status === "error" && <span className="context-status error">失败</span>}</h3>
-          <pre className="context-dialog-body">{detail.result ? pretty(detail.result.content) : "（尚无结果）"}</pre>
+          <h3>Arguments</h3>
+          <pre className="context-dialog-body">{detail.call.arguments ? pretty(detail.call.arguments) : "Unavailable: this call is no longer in context"}</pre>
+          <h3>Result{detail.result?.status === "error" && <span className="context-status error">Failed</span>}</h3>
+          <pre className="context-dialog-body">{detail.result ? pretty(detail.result.content) : "No result yet"}</pre>
         </> : <pre className="context-dialog-body">{detail.text}</pre>}
       </section>
     </div>}
@@ -155,8 +161,8 @@ export default function AgentContextPanel({ conversation }: { conversation: stri
 
 function ToolCard({ call, result, onOpen }: { call: AgentContextToolCall; result?: AgentContextMessage; onOpen: (detail: Detail) => void }) {
   const state = call.invalid ? "error" : !result ? "pending" : result.status === "error" ? "error" : "success";
-  return <button className={`context-tool ${state}`} onClick={() => onOpen({ kind: "call", call, result })} title="查看请求参数与完整结果">
-    <span className="context-tool-head"><code>{call.name}</code><span className={`context-status ${state}`}>{state === "pending" ? "等待结果" : state === "error" ? "失败" : "完成"}</span></span>
+  return <button className={`context-tool ${state}`} onClick={() => onOpen({ kind: "call", call, result })} title="View arguments and full result">
+    <span className="context-tool-head"><code>{call.name}</code><span className={`context-status ${state}`}>{state === "pending" ? "Pending" : state === "error" ? "Failed" : "Complete"}</span></span>
     {result && <pre className="context-tool-result">{result.content.slice(0, 1500)}</pre>}
   </button>;
 }

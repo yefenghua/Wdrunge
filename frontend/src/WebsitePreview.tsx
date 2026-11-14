@@ -43,9 +43,9 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
   function refreshPreview() {
     try {
       const next = localPreviewUrl(address);
-      setError(''); setNotice('正在重新获取网页和资源…'); setRefreshing(true);
+      setError(''); setNotice('Fetching the page and assets…'); setRefreshing(true);
       if (refreshTimer.current) clearTimeout(refreshTimer.current);
-      refreshTimer.current = setTimeout(() => finishRefresh('无法强制刷新：请确认网站已接入最新选择脚本且服务正常。'), 20000);
+      refreshTimer.current = setTimeout(() => finishRefresh('Force refresh timed out. Confirm the site uses the latest selection script and is running.'), 20000);
       if (ready && canReload.current && next === lastPageUrl.current) {
         refreshPhase.current = 'fetching'; command('wdrunge:reload');
       } else {
@@ -91,7 +91,7 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
       if (typeof data.pageId !== 'string') return;
       if (data.type === 'wdrunge:ready') {
         try { if (new URL(localPreviewUrl(data.url)).origin !== origin) return; } catch { return; }
-        if (pageId.current && pageId.current !== data.pageId) discard('页面已重新加载，请重新选择。');
+        if (pageId.current && pageId.current !== data.pageId) discard('The page reloaded. Select the area again.');
         pageId.current = data.pageId; lastReady.current = Date.now(); setReady(true);
         canReload.current = Array.isArray(data.capabilities) && data.capabilities.includes('reload');
         if (lastPageUrl.current !== data.url) { lastPageUrl.current = data.url; setAddress(data.url); }
@@ -103,17 +103,17 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
       if (data.pageId !== pageId.current) return;
       if (data.type === 'wdrunge:reloading' && refreshPhase.current === 'fetching') refreshPhase.current = 'reloading';
       if (data.type === 'wdrunge:reload-error' && refreshPhase.current !== 'idle') {
-        finishRefresh(typeof data.message === 'string' ? data.message.slice(0, 300) : '资源刷新失败，请重试。');
+        finishRefresh(typeof data.message === 'string' ? data.message.slice(0, 300) : 'Could not refresh the assets. Try again.');
         return;
       }
       if (data.type === 'wdrunge:page') {
-        discard('页面路由已变化，旧选择已清除，请重新选择。');
+        discard('The page route changed. The previous selection was cleared.');
         if (typeof data.url === 'string') { lastPageUrl.current = data.url; setAddress(data.url); }
       }
       if (data.type === 'wdrunge:selection') {
         const item = parseContext(data.context);
         if (!item || new URL(item.url).origin !== origin) return;
-        setContext(item); setNotice(item.elements.length || item.region ? '' : '选择已清除；如果页面替换了元素，请重新点选。');
+        setContext(item); setNotice(item.elements.length || item.region ? '' : 'Selection cleared. If the page replaced the element, select it again.');
         if (['browse','point'].includes(data.mode)) setMode(data.mode);
         if (awaiting.current && data.requestId === awaiting.current.id) { awaiting.current.resolve(item); awaiting.current = null; }
       }
@@ -127,21 +127,21 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
       command('wdrunge:connect');
       if (lastReady.current && Date.now() - lastReady.current > 3000) {
         lastReady.current = 0; pageId.current = ''; setReady(false); setMode('browse');
-        discard('预览连接已断开，请检查页面地址和选择脚本。');
+        discard('Preview disconnected. Check the URL and selection script.');
       }
     }, 800);
     command('wdrunge:connect');
     return () => {
       window.removeEventListener('message', receive); window.removeEventListener('keydown', escape); clearInterval(timer);
-      awaiting.current?.reject(new Error('预览已关闭或切换')); awaiting.current = null;
+      awaiting.current?.reject(new Error('Preview closed or changed')); awaiting.current = null;
     };
   }, [url, revision, origin]);
   function freshContext(): Promise<VisualContext> {
-    if (awaiting.current) return Promise.reject(new Error('正在获取选区，请稍后再试。'));
+    if (awaiting.current) return Promise.reject(new Error('Capturing the selection. Try again shortly.'));
     return new Promise((resolve, reject) => {
       const id = crypto.randomUUID();
       const timer = setTimeout(() => {
-        if (awaiting.current?.id === id) { awaiting.current = null; reject(new Error('无法获取最新页面信息，请刷新后重新选择。')); }
+        if (awaiting.current?.id === id) { awaiting.current = null; reject(new Error('Could not capture the latest page state. Refresh and select again.')); }
       }, 2500);
       awaiting.current = { id, resolve: value => { clearTimeout(timer); resolve(value); }, reject: error => { clearTimeout(timer); reject(error); } };
       command('wdrunge:snapshot', { requestId: id });
@@ -152,7 +152,7 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
     setSending(true); setError('');
     try {
       await onRequest(content); setRequirement('');
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '发送失败'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not send the request'); }
     finally { setSending(false); }
   }
   async function addAnnotation() {
@@ -162,11 +162,11 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
     try {
       const current = await freshContext();
       const key = JSON.stringify([current.url, current.elements.map(item => item.selector), current.region]);
-      if ((!current.elements.length && !current.region) || key !== originalKey) throw new Error('选区已变化，请重新选择并填写批注。');
-      if (annotations.length >= 10) throw new Error('一次最多添加 10 条批注，请先在群聊中发送或删除部分批注。');
+      if ((!current.elements.length && !current.region) || key !== originalKey) throw new Error('The selection changed. Select it again before adding the annotation.');
+      if (annotations.length >= 10) throw new Error('You can add up to 10 annotations at once. Send or remove some first.');
       onAnnotation({ id: crypto.randomUUID(), comment: requirement.trim(), context: current });
       command('wdrunge:clear'); setRequirement('');
-    } catch (cause) { setError(cause instanceof Error ? cause.message : '添加批注失败'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not add the annotation'); }
     finally { setSending(false); }
   }
   const scriptUrl = new URL(`${import.meta.env.BASE_URL}visual-inspector.js`, window.location.href).href;
@@ -177,44 +177,44 @@ export default function WebsitePreview({ onRequest, onAnnotation, onSelection, a
   const popupStyle = { left: Math.max(8, Math.min(anchor?.x || 8, bounds.width - 348)),
     top: Math.max(8, Math.min(anchor && anchor.y + anchor.height + popupHeight + 16 < bounds.height ? anchor.y + anchor.height + 8 : (anchor?.y || popupHeight + 16) - popupHeight - 8, bounds.height - popupHeight - 8)) };
   function choose(next: Mode) { setMode(next); command('wdrunge:mode', { mode: next }); }
-  return <section className="website-preview" aria-label="网站预览">
-    <header><strong>网站预览</strong><button onClick={onClose}>返回办公室</button></header>
+  return <section className="website-preview" aria-label="Site preview">
+    <header><strong>Site Preview</strong><button onClick={onClose}>Back to Office</button></header>
     <form className="website-address" onSubmit={event => {
       event.preventDefault();
       try { const next = localPreviewUrl(address); finishRefresh(); setUrl(next); setRevision(value => value + 1); setError(''); setNotice(''); }
       catch (cause) { setError((cause as Error).message); }
-    }}><input aria-label="预览网站地址" value={address} onChange={event => setAddress(event.target.value)} /><button>打开</button>
-      <button type="button" disabled={!url || refreshing} onClick={refreshPreview}>{refreshing ? '刷新中…' : '刷新'}</button></form>
+    }}><input aria-label="Preview URL" value={address} onChange={event => setAddress(event.target.value)} /><button>Open</button>
+      <button type="button" disabled={!url || refreshing} onClick={refreshPreview}>{refreshing ? 'Refreshing…' : 'Refresh'}</button></form>
     <div className="website-tools">
-      <button disabled={!ready || refreshing} aria-pressed={mode === 'browse'} onClick={() => choose('browse')}>浏览网页</button>
-      <button disabled={!ready || refreshing} aria-pressed={mode === 'point'} onClick={() => choose('point')}>选择修改位置</button>
-      {hasSelection && <><button onClick={() => setPopupOpen(value => !value)}>批注选区</button>
-        <button disabled={elements.length !== 1 || !elements[0]?.ancestors.length} onClick={() => command('wdrunge:parent')}>选择父级区域</button>
-        <button onClick={() => command('wdrunge:clear')}>清空选择</button></>}
-      <span role="status">{refreshing ? '正在刷新网页资源…' : !ready ? '等待网页接入选择脚本' : mode === 'point' ? '点击单选 · 拖动框选 · 再点取消 · Shift 追加 · Esc 退出' : '已连接，可点选元素'}</span>
+      <button disabled={!ready || refreshing} aria-pressed={mode === 'browse'} onClick={() => choose('browse')}>Browse</button>
+      <button disabled={!ready || refreshing} aria-pressed={mode === 'point'} onClick={() => choose('point')}>Select Area</button>
+      {hasSelection && <><button onClick={() => setPopupOpen(value => !value)}>Annotate Selection</button>
+        <button disabled={elements.length !== 1 || !elements[0]?.ancestors.length} onClick={() => command('wdrunge:parent')}>Select Parent</button>
+        <button onClick={() => command('wdrunge:clear')}>Clear Selection</button></>}
+      <span role="status">{refreshing ? 'Refreshing page assets…' : !ready ? 'Waiting for the selection script' : mode === 'point' ? 'Click to select · Drag to box-select · Click again to remove · Shift to add · Esc to exit' : 'Connected — select an element'}</span>
     </div>
     {notice && <p role="status" className="website-notice">{notice}</p>}
     {error && <p role="alert" className="website-error">{error}</p>}
-    {url && !ready && <details className="website-setup"><summary>网页可以浏览，但还不能点选？接入选择脚本</summary>
-      <p>开发页面需加入以下脚本，并刷新预览。若网页无法显示，请先启动服务并确认允许 iframe 嵌入。</p><code>{snippet}</code>
-      <button disabled={busy || sending} onClick={() => void submit(`请为当前项目的本地开发网页接入 Wdrunge 元素选择脚本。预览地址是 ${url}。在开发入口 HTML 或框架的开发环境入口加入 ${snippet}，仅限开发环境，避免生产页面加载本机脚本。先检查现有框架和入口，修改后检查服务并告知我刷新预览。`)}>让 Agent 接入</button>
+    {url && !ready && <details className="website-setup"><summary>Can browse but not select? Add the selection script</summary>
+      <p>Add this script to the development page, then refresh the preview. If the page does not load, start its server and allow iframe embedding.</p><code>{snippet}</code>
+      <button disabled={busy || sending} onClick={() => void submit(`Add the Wdrunge element-selection script to this project's local development site. The preview URL is ${url}. Add ${snippet} to the development entry HTML or framework entry, in development only, so the production site never loads a local script. Inspect the existing framework and entry point first, then verify the service and tell me to refresh the preview.`)}>Ask Agent to Add It</button>
     </details>}
-    <div className="website-viewport" ref={viewport}>{url ? <iframe key={`${url}:${revision}`} ref={frame} title="项目网站" src={url}
+    <div className="website-viewport" ref={viewport}>{url ? <iframe key={`${url}:${revision}`} ref={frame} title="Project site" src={url}
       sandbox="allow-scripts allow-same-origin allow-forms" referrerPolicy="no-referrer" onLoad={() => {
         if (refreshPhase.current === 'reloading') finishRefresh();
         token.current = crypto.randomUUID(); pageId.current = ''; lastReady.current = 0;
-        setReady(false); setContext(null); setMode('browse'); discard('页面已加载，请选择要修改的位置。'); command('wdrunge:connect');
-      }} /> : <div className="website-empty">启动项目网站后，在上方输入本机地址并打开。<br />点选元素、Shift 多选或框选区域，告诉团队你想如何修改。</div>}
-    {hasSelection && popupOpen && <form ref={popover} className="website-comment-popover" aria-label="选区批注" style={popupStyle}
+        setReady(false); setContext(null); setMode('browse'); discard('Page loaded. Select the area you want to change.'); command('wdrunge:connect');
+      }} /> : <div className="website-empty">Start the project site, then enter its local URL above.<br />Select elements or drag over a region to show the team what to change.</div>}
+    {hasSelection && popupOpen && <form ref={popover} className="website-comment-popover" aria-label="Selection annotation" style={popupStyle}
       onSubmit={event => { event.preventDefault(); void addAnnotation(); }}>
-      <div className="website-comment-heading"><strong>{context?.region ? `已框选区域 · ${elements.length} 个元素` : elements.length === 1 ? `已选中 ${elements[0].tag}` : `已选中 ${elements.length} 个元素`}</strong>
-        <button type="button" aria-label="关闭批注框" onClick={() => setPopupOpen(false)}>×</button></div>
-      <div className="website-selection-list">{elements.map((element, index) => <div key={`${element.selector}:${index}`}><span title={element.selector}>{element.tag} · {element.text || element.selector}</span><button type="button" aria-label={`移除第 ${index + 1} 个元素`} onClick={() => command('wdrunge:remove', { index })}>×</button></div>)}</div>
-      {context?.truncated && <small role="status">最多保留 20 个元素，请缩小范围或分批修改。</small>}
-      {context?.region && !elements.length && <small>区域只包含坐标，建议选中附近元素帮助定位。</small>}
-      <textarea aria-label="选区批注意见" disabled={sending || busy} placeholder="这个位置要怎样修改？" value={requirement} onChange={event => setRequirement(event.target.value)} maxLength={2000}
+      <div className="website-comment-heading"><strong>{context?.region ? `Region selected · ${elements.length} elements` : elements.length === 1 ? `Selected ${elements[0].tag}` : `${elements.length} elements selected`}</strong>
+        <button type="button" aria-label="Close annotation" onClick={() => setPopupOpen(false)}>×</button></div>
+      <div className="website-selection-list">{elements.map((element, index) => <div key={`${element.selector}:${index}`}><span title={element.selector}>{element.tag} · {element.text || element.selector}</span><button type="button" aria-label={`Remove element ${index + 1}`} onClick={() => command('wdrunge:remove', { index })}>×</button></div>)}</div>
+      {context?.truncated && <small role="status">Only the first 20 elements are kept. Narrow the region or split the request.</small>}
+      {context?.region && !elements.length && <small>This region contains coordinates only. Select a nearby element to improve targeting.</small>}
+      <textarea aria-label="Annotation comment" disabled={sending || busy} placeholder="What should change here?" value={requirement} onChange={event => setRequirement(event.target.value)} maxLength={2000}
         onKeyDown={event => { if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) { event.preventDefault(); if (requirement.trim()) void addAnnotation(); } }} />
-      <div className="website-comment-footer"><small>也可直接在右侧群聊提要求</small><button disabled={!requirement.trim() || !ready || busy || sending}>{sending ? '正在添加…' : '添加批注'}</button></div>
+      <div className="website-comment-footer"><small>You can also send the request in team chat</small><button disabled={!requirement.trim() || !ready || busy || sending}>{sending ? 'Adding…' : 'Add Annotation'}</button></div>
     </form>}
     </div>
   </section>;

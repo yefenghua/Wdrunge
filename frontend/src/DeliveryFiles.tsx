@@ -81,7 +81,7 @@ async function buildHtmlPreview(content: string, path: string, project: string, 
         element.setAttribute('href', '#');
       } else if (href && !href.startsWith('#')) {
         element.setAttribute('href', '#');
-        element.setAttribute('title', '外部跳转已在安全预览中停用');
+        element.setAttribute('title', 'External links are disabled in this preview');
       }
       return;
     }
@@ -162,12 +162,12 @@ export function DeliveryTree({ files, selected, onOpen }: { files: DeliveryState
     });
   }
   return <div className="delivery-browser">
-    <label className="delivery-search"><span aria-hidden="true">⌕</span><input aria-label="筛选交付文件" placeholder="查找文件或文件夹…" value={query} onChange={event => setQuery(event.target.value)} /></label>
-    <div className="delivery-tree-heading"><span>项目文件</span><span className={`delivery-connection ${files.status}`} role="status"><i />{files.status === 'live' ? '实时同步' : files.status === 'connecting' ? '正在加载' : '正在重新连接'}</span></div>
-    <nav aria-label="交付文件目录"><ul>{branch('', 0)}</ul></nav>
-    {files.status === 'live' && !files.entries.length && <div className="delivery-empty">还没有交付文件<small>团队创建文件后会自动出现在这里。</small></div>}
-    {!!files.entries.length && !shown.size && <p className="delivery-empty">没有匹配的文件或文件夹</p>}
-    {files.truncated && <p className="delivery-note">目录超过 10,000 项，当前仅显示前 10,000 项。</p>}
+    <label className="delivery-search"><span aria-hidden="true">⌕</span><input aria-label="Filter delivery files" placeholder="Find files or folders…" value={query} onChange={event => setQuery(event.target.value)} /></label>
+    <div className="delivery-tree-heading"><span>Project files</span><span className={`delivery-connection ${files.status}`} role="status"><i />{files.status === 'live' ? 'Live sync' : files.status === 'connecting' ? 'Loading…' : 'Reconnecting…'}</span></div>
+    <nav aria-label="Delivery file tree"><ul>{branch('', 0)}</ul></nav>
+    {files.status === 'live' && !files.entries.length && <div className="delivery-empty">No delivered files yet<small>Files appear here as the team creates them.</small></div>}
+    {!!files.entries.length && !shown.size && <p className="delivery-empty">No matching files or folders</p>}
+    {files.truncated && <p className="delivery-note">This directory has over 10,000 items. Only the first 10,000 are shown.</p>}
   </div>;
 }
 
@@ -192,10 +192,10 @@ export function DeliveryPreview({ project, path, revision, status, onClose, onOp
     setRefreshing(true);
     void fetch(`${deliveryUrl(project, 'preview')}?path=${encodeURIComponent(path)}`, { signal: controller.signal, cache: 'no-store' }).then(async response => {
       const data = await response.json();
-      if (!response.ok) throw new Error(data.detail || '文件暂时无法读取');
+      if (!response.ok) throw new Error(data.detail || 'Could not read this file');
       if (current) { setPreview(data); setError(''); setResourceVersion(revision); }
     }).catch(cause => {
-      if (current) { setPreview(null); setError(cause instanceof Error ? cause.message : '文件暂时无法读取'); }
+      if (current) { setPreview(null); setError(cause instanceof Error ? cause.message : 'Could not read this file'); }
     }).finally(() => { if (current) setRefreshing(false); });
     return () => { current = false; controller.abort(); };
   }, [project, path, revision]);
@@ -208,7 +208,7 @@ export function DeliveryPreview({ project, path, revision, status, onClose, onOp
     const controller = new AbortController();
     void buildHtmlPreview(preview.content, path, project, resourceVersion, controller.signal)
       .then(content => setHtmlDocument(content))
-      .catch(cause => { if (!controller.signal.aborted) setHtmlError(cause instanceof Error ? cause.message : '无法生成页面预览'); });
+      .catch(cause => { if (!controller.signal.aborted) setHtmlError(cause instanceof Error ? cause.message : 'Could not generate the page preview'); });
     return () => controller.abort();
   }, [isHtml, preview, path, project, resourceVersion]);
   useEffect(() => {
@@ -224,22 +224,22 @@ export function DeliveryPreview({ project, path, revision, status, onClose, onOp
   function localPath(href: string | undefined) {
     return workspacePath(path, href || null);
   }
-  return <section className="delivery-overlay" role="dialog" aria-label={`文件预览：${path}`} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onClose(); } }}>
-    <header className="delivery-preview-heading"><div><span className="delivery-preview-eyebrow">{isHtml ? '可视化页面' : '交付文档'}</span><strong title={path}>{path.split('/').pop()}</strong><small title={path}>{path}</small></div><button type="button" ref={closeButton} onClick={onClose} aria-label="关闭文件预览" title="关闭 · Esc">×</button></header>
-    <div className="delivery-preview-toolbar"><span role="status">{refreshing ? '正在更新…' : status === 'live' ? '已同步最新文件' : '连接恢复后自动更新'}{preview && ` · ${formatSize(preview.size)}`}</span><div className="delivery-preview-actions">{isHtml && <div className="delivery-view-switch" role="group" aria-label="HTML 查看方式"><button type="button" className={htmlView === 'page' ? 'active' : ''} aria-pressed={htmlView === 'page'} onClick={() => setHtmlView('page')}>页面预览</button><button type="button" className={htmlView === 'source' ? 'active' : ''} aria-pressed={htmlView === 'source'} onClick={() => setHtmlView('source')}>查看源码</button></div>}<a href={`${resource}&download=true`}>下载文件 ↗</a></div></div>
+  return <section className="delivery-overlay" role="dialog" aria-label={`File preview: ${path}`} onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); onClose(); } }}>
+    <header className="delivery-preview-heading"><div><span className="delivery-preview-eyebrow">{isHtml ? 'Page preview' : 'Delivery file'}</span><strong title={path}>{path.split('/').pop()}</strong><small title={path}>{path}</small></div><button type="button" ref={closeButton} onClick={onClose} aria-label="Close file preview" title="Close · Esc">×</button></header>
+    <div className="delivery-preview-toolbar"><span role="status">{refreshing ? 'Updating…' : status === 'live' ? 'Up to date' : 'Updates after reconnecting'}{preview && ` · ${formatSize(preview.size)}`}</span><div className="delivery-preview-actions">{isHtml && <div className="delivery-view-switch" role="group" aria-label="HTML view mode"><button type="button" className={htmlView === 'page' ? 'active' : ''} aria-pressed={htmlView === 'page'} onClick={() => setHtmlView('page')}>Preview</button><button type="button" className={htmlView === 'source' ? 'active' : ''} aria-pressed={htmlView === 'source'} onClick={() => setHtmlView('source')}>Source</button></div>}<a href={`${resource}&download=true`}>Download ↗</a></div></div>
     <div className={`delivery-preview-body${isHtml && htmlView === 'page' ? ' delivery-html-view' : ''}`}>
-      {error && <div className="delivery-preview-empty" role="alert"><strong>{error}</strong><p>目录会继续同步，文件重新出现后会自动打开。</p></div>}
-      {!preview && !error && <div className="delivery-preview-empty">正在打开文件…</div>}
+      {error && <div className="delivery-preview-empty" role="alert"><strong>{error}</strong><p>This file will reopen automatically when it becomes available.</p></div>}
+      {!preview && !error && <div className="delivery-preview-empty">Opening file…</div>}
       {preview?.kind === 'markdown' && <div className="markdown-body delivery-markdown"><ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]} skipHtml components={{
         a: ({ href, children }) => { const local = localPath(href); return local ? <a href="#" onClick={event => { event.preventDefault(); onOpen(local); }}>{children}</a> : <a href={href} target={href?.startsWith('#') ? undefined : '_blank'} rel="noopener noreferrer">{children}</a>; },
         img: ({ src, alt }) => { const local = localPath(typeof src === 'string' ? src : undefined); return <img alt={alt || ''} src={local ? `${deliveryUrl(project, 'file')}?path=${encodeURIComponent(local)}&revision=${encodeURIComponent(resourceVersion)}` : src} loading="lazy" />; },
       }}>{preview.content}</ReactMarkdown></div>}
-      {isHtml && htmlView === 'page' && (htmlError ? <div className="delivery-preview-empty" role="alert"><strong>页面预览暂时无法生成</strong><p>{htmlError}</p><button type="button" onClick={() => setHtmlView('source')}>查看源码</button></div> : htmlDocument ? <iframe ref={htmlFrame} className="delivery-html" title={`${path} 页面预览`} sandbox="allow-scripts" referrerPolicy="no-referrer" srcDoc={htmlDocument} /> : <div className="delivery-preview-empty">正在生成可视化预览…</div>)}
+      {isHtml && htmlView === 'page' && (htmlError ? <div className="delivery-preview-empty" role="alert"><strong>Page preview unavailable</strong><p>{htmlError}</p><button type="button" onClick={() => setHtmlView('source')}>Source</button></div> : htmlDocument ? <iframe ref={htmlFrame} className="delivery-html" title={`${path} preview`} sandbox="allow-scripts" referrerPolicy="no-referrer" srcDoc={htmlDocument} /> : <div className="delivery-preview-empty">Preparing preview…</div>)}
       {preview?.kind === 'text' && (!isHtml || htmlView === 'source') && <pre className="delivery-source"><code>{preview.content}</code></pre>}
       {preview?.kind === 'image' && <div className="delivery-image"><img src={resource} alt={path} /></div>}
       {preview?.kind === 'pdf' && <iframe className="delivery-pdf" title={path} src={resource} />}
-      {preview?.kind === 'unsupported' && <div className="delivery-preview-empty"><strong>此文件暂不支持在线预览</strong><p>可以下载后使用对应应用打开。</p><a href={`${resource}&download=true`}>下载 {path.split('/').pop()}</a></div>}
-      {preview?.truncated && <p className="delivery-note">文件较大，当前显示前 2 MB 内容。下载可查看完整文件。</p>}
+      {preview?.kind === 'unsupported' && <div className="delivery-preview-empty"><strong>Preview unavailable for this file type</strong><p>Download the file to open it in another app.</p><a href={`${resource}&download=true`}>Download {path.split('/').pop()}</a></div>}
+      {preview?.truncated && <p className="delivery-note">Showing the first 2 MB. Download the file to view it in full.</p>}
     </div>
   </section>;
 }

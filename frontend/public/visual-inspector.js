@@ -20,16 +20,16 @@
         ...performance.getEntriesByType('resource').filter(entry => ['link', 'script', 'css', 'img'].includes(entry.initiatorType)).map(entry => entry.name)];
       const urls = [...new Set(resources.map(value => new URL(value, location.href)).filter(url =>
         url.origin === location.origin && ['http:', 'https:'].includes(url.protocol)).map(url => { url.hash = ''; return url.href; }))];
-      if (urls.length > 100) throw new Error('页面资源过多，请使用浏览器强制刷新。');
+      if (urls.length > 100) throw new Error('Too many page assets. Use the browser\'s hard refresh.');
       await Promise.all(urls.map(async url => {
         const response = await fetch(url, { cache: 'reload', credentials: 'same-origin', signal: controller.signal });
-        if (!response.ok) throw new Error(`资源刷新失败（${response.status}）：${new URL(url).pathname}`);
+        if (!response.ok) throw new Error(`Asset refresh failed (${response.status}): ${new URL(url).pathname}`);
         await response.arrayBuffer(); // Wait until the updated response has entered the HTTP cache.
       }));
       send('wdrunge:reloading'); location.reload();
     } catch (error) {
       controller.abort(); reloading = false;
-      send('wdrunge:reload-error', { message: error.name === 'AbortError' ? '重新获取页面资源超时，请检查网站服务后重试。' : error.message });
+      send('wdrunge:reload-error', { message: error.name === 'AbortError' ? 'Timed out while refreshing page assets. Check the site and try again.' : error.message });
     } finally { clearTimeout(timer); }
   }
   const host = document.createElement('div');

@@ -5,8 +5,8 @@ export type CharacterAction = "rest" | "typing" | "mouse" | "drawing" | "sleepin
 export type InputMode = "keyboard" | "mouse" | "pen" | "keyboard-mouse" | "none";
 export interface ActionSample { action: CharacterAction; time: number; duration: number; input: InputMode }
 export const actionNames: Record<CharacterAction, string> = {
-  rest: "休息", typing: "敲键盘", mouse: "用鼠标 / 触控板", drawing: "绘图", sleeping: "趴着睡觉",
-  phone: "刷手机", drinking: "喝水", stretching: "伸懒腰", gaming: "打游戏（后端 / 测试）",
+  rest: "Rest", typing: "Type", mouse: "Pointer", drawing: "Draw", sleeping: "Sleep",
+  phone: "Use phone", drinking: "Drink", stretching: "Stretch", gaming: "Game (Backend / Testing)",
 };
 export const actionDurations: Record<CharacterAction, number> = {
   rest: 7, typing: 10, mouse: 6, drawing: 16, sleeping: 15, phone: 10, drinking: 7, stretching: 7, gaming: 12,

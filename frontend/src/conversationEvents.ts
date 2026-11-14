@@ -2,7 +2,7 @@ import type { Activity, ConversationEvent, TeamChatMessage } from './api';
 
 type Message = TeamChatMessage & { time: string; createdAt?: number; read?: boolean; readBy?: string[]; completedBy?: string[] };
 type View = { messages: Message[]; activities: (Activity & { time: string; createdAt?: number })[] };
-const clock = (value: string) => new Intl.DateTimeFormat('zh-CN', {hour:'2-digit', minute:'2-digit', hour12:false}).format(new Date(value));
+const clock = (value: string) => new Intl.DateTimeFormat('en-GB', {hour:'2-digit', minute:'2-digit', hour12:false}).format(new Date(value));
 
 const chronological = <T extends {createdAt?: number}>(items: T[]) => items.sort((a, b) => (a.createdAt ?? 0) - (b.createdAt ?? 0));
 
