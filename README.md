@@ -124,11 +124,16 @@ The recorded 24 November Windows integration reported 487 passed, 84 failed, 25 
 - evaluation/ — sample inputs, results and trace index.
 - ai_assistance/ — AI-use declaration and representative development prompts.
 
+## Third-party resources
+
+Wdrunge uses LangGraph for agent execution and checkpoints, LangChain for model and tool abstractions, and Alibaba Cloud DashScope for inference. FastAPI, SQLAlchemy, SQLite and Alembic support APIs and persistence. React and Three.js support the interface and office visualization; Tauri is the optional desktop shell, and Playwright/Chromium support browser verification. Frontend API types and client code are generated with `@hey-api/openapi-ts`. Dependency versions are recorded in the manifests and lockfiles. See the final report for references and attribution.
+
 ## Security and limitations
 
 Do not commit API keys, .env, generated credentials, private databases or unredacted logs. Task isolation is not a complete security boundary. Preview and annotation constraints are documented in [visual feedback](docs/visual-feedback.md).
 
 ## Submission and version
 
-See [VERSION.txt](VERSION.txt), [integration notes](docs/final-integration.md), [frontend README](frontend/README.md), [changes](CHANGELOG.md) and [missing items](MISSING_ITEMS.md). Source revision is identified by the archive's commit SHA. Package the complete tracked source as a ZIP, with the report PDF submitted separately.
+See [VERSION.txt](VERSION.txt), [integration notes](docs/final-integration.md), [frontend README](frontend/README.md), and [changes](CHANGELOG.md). Source revision is identified by the archive's commit SHA. Package the complete tracked source as a ZIP, with the report PDF submitted separately.
 
+<sub>Source: [GitHub](https://github.com/yefenghua/Wdrunge/tree/main)</sub>
