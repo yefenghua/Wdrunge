@@ -1,0 +1,76 @@
+{
+  "request": {
+    "id": "leader:r4-backend-markdown",
+    "sender": "leader",
+    "recipient": "backend",
+    "goal": "为留言板后端放宽内容字段长度限制，支持 Markdown 原样存储（不解析/不转换）。\n\n具体要求：\n1. 内容最大长度从当前限制放宽至 2000 字符（trim 后），超长返回明确错误（400 或 422），错误信息中说明最大长度。\n2. 保留原有校验：trim 后非空、分类校验（general/feedback）、时间戳自动生成。\n3. 存储时不解析/不转换 Markdown，原样存储用户输入。\n4. 更新接口契约文档 docs/api-contract.md，反映内容长度变更（最大 2000 字符）。\n\n自测：\n- POST content 2000 字符 → 成功\n- POST content 2001 字符 → 被拒绝，错误信息含最大长度\n- POST content 为 Markdown 格式（如 # 标题、**粗体**、```代码块```）→ 原样存储并返回\n- 原有分类校验、trim 非空等仍正常",
+    "conversation": "c22c076e-7b29-4781-8f9b-8f657d11f007",
+    "based_on": [
+      {
+        "document_id": "71ef4db8993b49b69f058a98b7494413",
+        "version": 1
+      }
+    ],
+    "dependencies": [],
+    "artifacts": [],
+    "parent": null,
+    "priority": 1,
+    "deadline": null,
+    "summary": "后端：放宽内容长度至 2000 字符并更新接口契约",
+    "services": [
+      "backend"
+    ],
+    "verification": "self",
+    "goal_id": "c22c076e-7b29-4781-8f9b-8f657d11f007:r4-markdown-render",
+    "acceptance_criteria": [
+      "内容最大长度放宽至 2000 字符，超长返回明确错误",
+      "保留 trim 非空、分类、时间戳等原有校验",
+      "Markdown 内容原样存储不转换",
+      "接口契约文档已更新"
+    ],
+    "spec": {
+      "sender": "leader",
+      "recipient": "backend",
+      "goal": "为留言板后端放宽内容字段长度限制，支持 Markdown 原样存储（不解析/不转换）。\n\n具体要求：\n1. 内容最大长度从当前限制放宽至 2000 字符（trim 后），超长返回明确错误（400 或 422），错误信息中说明最大长度。\n2. 保留原有校验：trim 后非空、分类校验（general/feedback）、时间戳自动生成。\n3. 存储时不解析/不转换 Markdown，原样存储用户输入。\n4. 更新接口契约文档 docs/api-contract.md，反映内容长度变更（最大 2000 字符）。\n\n自测：\n- POST content 2000 字符 → 成功\n- POST content 2001 字符 → 被拒绝，错误信息含最大长度\n- POST content 为 Markdown 格式（如 # 标题、**粗体**、```代码块```）→ 原样存储并返回\n- 原有分类校验、trim 非空等仍正常",
+      "conversation": "c22c076e-7b29-4781-8f9b-8f657d11f007",
+      "based_on": [
+        {
+          "document_id": "71ef4db8993b49b69f058a98b7494413",
+          "version": 1
+        }
+      ],
+      "dependencies": [],
+      "artifacts": [],
+      "parent": null,
+      "priority": 1,
+      "deadline": null,
+      "summary": "后端：放宽内容长度至 2000 字符并更新接口契约",
+      "services": [
+        "backend"
+      ],
+      "verification": "self",
+      "goal_id": "c22c076e-7b29-4781-8f9b-8f657d11f007:r4-markdown-render",
+      "acceptance_criteria": [
+        "内容最大长度放宽至 2000 字符，超长返回明确错误",
+        "保留 trim 非空、分类、时间戳等原有校验",
+        "Markdown 内容原样存储不转换",
+        "接口契约文档已更新"
+      ]
+    },
+    "state": "cancelled",
+    "created": 1794625558.049191,
+    "attempts": 1,
+    "result": "用户停止了当前对话的执行。",
+    "delivered": [],
+    "needs_review": false,
+    "origin_message": "b7fb1aca8922d4b27b2e10092d0a81cb4986c624263139f13295d5c855821b48",
+    "lease_owner": null,
+    "lease_until": 0,
+    "workspace_id": "092791acf2eb4e7fa01fd818607a5668",
+    "workspace_published": false,
+    "instance_id": null
+  },
+  "functional_backend_unchanged": true,
+  "excluded_from_delivery": true,
+  "attributed_tokens": 138877
+}

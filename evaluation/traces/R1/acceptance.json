@@ -1,0 +1,113 @@
+{
+  "at": "2026-11-13T17:54:30.049Z",
+  "passed": 20,
+  "total": 20,
+  "all_passed": true,
+  "records": [
+    {
+      "id": "heading",
+      "pass": true,
+      "evidence": "HTTP page and heading visible"
+    },
+    {
+      "id": "initial_empty",
+      "pass": true,
+      "evidence": "Fresh isolated database empty"
+    },
+    {
+      "id": "inputs",
+      "pass": true,
+      "evidence": "Nickname and message inputs exist"
+    },
+    {
+      "id": "frontend_blank_3",
+      "pass": true,
+      "evidence": "Blank input prevented in browser before API request"
+    },
+    {
+      "id": "frontend_blank_4",
+      "pass": true,
+      "evidence": "Blank input prevented in browser before API request"
+    },
+    {
+      "id": "frontend_blank_5",
+      "pass": true,
+      "evidence": "Blank input prevented in browser before API request"
+    },
+    {
+      "id": "frontend_blank_6",
+      "pass": true,
+      "evidence": "Blank input prevented in browser before API request"
+    },
+    {
+      "id": "api_blank_7",
+      "pass": true,
+      "evidence": "HTTP 400"
+    },
+    {
+      "id": "api_blank_8",
+      "pass": true,
+      "evidence": "HTTP 400"
+    },
+    {
+      "id": "api_blank_9",
+      "pass": true,
+      "evidence": "HTTP 400"
+    },
+    {
+      "id": "api_blank_10",
+      "pass": true,
+      "evidence": "HTTP 400"
+    },
+    {
+      "id": "publish_clear",
+      "pass": true,
+      "evidence": "Content cleared"
+    },
+    {
+      "id": "trim",
+      "pass": true,
+      "evidence": "Stored strings trimmed"
+    },
+    {
+      "id": "two_messages",
+      "pass": true,
+      "evidence": "Two browser submissions persisted"
+    },
+    {
+      "id": "desktop_no_overflow",
+      "pass": true,
+      "evidence": "{\"button\":\"rgb(64, 150, 255)\",\"body\":\"rgba(0, 0, 0, 0)\",\"root\":\"rgb(240, 242, 245)\",\"card\":\"rgb(255, 255, 255)\",\"overflow\":false}"
+    },
+    {
+      "id": "delete_only_target",
+      "pass": true,
+      "evidence": "Only target deleted"
+    },
+    {
+      "id": "reload",
+      "pass": true,
+      "evidence": "Message retained"
+    },
+    {
+      "id": "restart",
+      "pass": true,
+      "evidence": "Retained after actual backend process restart"
+    },
+    {
+      "id": "final_empty",
+      "pass": true,
+      "evidence": "Empty state restored"
+    },
+    {
+      "id": "readme_commands_present",
+      "pass": true,
+      "evidence": "Frontend and backend startup commands present; actual instruction execution checked separately"
+    }
+  ],
+  "service_logs": [
+    "INFO:     Started server process [17005]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:51751 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51775 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51776 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51782 - \"POST /api/messages HTTP/1.1\" 400 Bad Request\nINFO:     127.0.0.1:51780 - \"POST /api/messages HTTP/1.1\" 400 Bad Request\nINFO:     127.0.0.1:51782 - \"POST /api/messages HTTP/1.1\" 400 Bad Request\nINFO:     127.0.0.1:51780 - \"POST /api/messages HTTP/1.1\" 400 Bad Request\nINFO:     127.0.0.1:51783 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:51784 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51785 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:51786 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51797 - \"DELETE /api/messages/2 HTTP/1.1\" 204 No Content\nINFO:     127.0.0.1:51780 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51802 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51804 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [17005]\n",
+    "\n> todo-experiment-frontend@0.1.0 dev\n> vite --host 127.0.0.1 --port 15173 --strictPort\n\n1:54:20 AM [vite] (client) Re-optimizing dependencies because vite config has changed\n\n  VITE v8.3.8  ready in 372 ms\n\n  ➜  Local:   http://127.0.0.1:15173/\n",
+    "INFO:     Started server process [17060]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:51808 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51811 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51812 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:51815 - \"DELETE /api/messages/1 HTTP/1.1\" 204 No Content\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [17060]\n"
+  ]
+}

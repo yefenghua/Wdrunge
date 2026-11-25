@@ -1,0 +1,7 @@
+Application version: 0.1.0
+Submission branch: delivery
+Original evaluated integration baseline: 927ca26a638af56bb31bfce8fbe67f3e7d2f42e7
+Packaging revision: use the archive commit SHA or git rev-parse HEAD.
+Historical results refer to their recorded revisions; documentation changes are not fresh evaluation runs.
+Case evidence: R1 (ordinary), R2b (changed request), original R3 (scope-control failure), recorded 14 November 2026 UTC+08:00.
+

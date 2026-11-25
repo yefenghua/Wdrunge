@@ -1,0 +1,268 @@
+{
+  "conversation_id": "41199a8d-bf78-4903-bebf-dbca52412f0a",
+  "totals": {
+    "key": null,
+    "calls": 199,
+    "total_tokens": 2976198,
+    "input_tokens": 2913396,
+    "output_tokens": 62802,
+    "reasoning_tokens": 17346,
+    "cached_tokens": 2179968,
+    "cache_input_tokens": 2913396,
+    "cache_percent": 74.8,
+    "latency_ms": 11178,
+    "retries": 12
+  },
+  "by_agent": [
+    {
+      "key": "frontend",
+      "calls": 36,
+      "total_tokens": 778787,
+      "input_tokens": 763586,
+      "output_tokens": 15201,
+      "reasoning_tokens": 5237,
+      "cached_tokens": 627072,
+      "cache_input_tokens": 763586,
+      "cache_percent": 82.1,
+      "latency_ms": 13086,
+      "retries": 0
+    },
+    {
+      "key": "testing",
+      "calls": 28,
+      "total_tokens": 768621,
+      "input_tokens": 753986,
+      "output_tokens": 14635,
+      "reasoning_tokens": 5138,
+      "cached_tokens": 656896,
+      "cache_input_tokens": 753986,
+      "cache_percent": 87.1,
+      "latency_ms": 20583,
+      "retries": 0
+    },
+    {
+      "key": "leader",
+      "calls": 32,
+      "total_tokens": 606649,
+      "input_tokens": 597860,
+      "output_tokens": 8789,
+      "reasoning_tokens": 2793,
+      "cached_tokens": 465536,
+      "cache_input_tokens": 597860,
+      "cache_percent": 77.9,
+      "latency_ms": 11751,
+      "retries": 0
+    },
+    {
+      "key": "backend",
+      "calls": 26,
+      "total_tokens": 366821,
+      "input_tokens": 356425,
+      "output_tokens": 10396,
+      "reasoning_tokens": 2559,
+      "cached_tokens": 275328,
+      "cache_input_tokens": 356425,
+      "cache_percent": 77.2,
+      "latency_ms": 10868,
+      "retries": 1
+    },
+    {
+      "key": "reviewer",
+      "calls": 55,
+      "total_tokens": 246900,
+      "input_tokens": 239735,
+      "output_tokens": 7165,
+      "reasoning_tokens": 0,
+      "cached_tokens": 6528,
+      "cache_input_tokens": 239735,
+      "cache_percent": 2.7,
+      "latency_ms": 4857,
+      "retries": 10
+    },
+    {
+      "key": "designer",
+      "calls": 11,
+      "total_tokens": 105847,
+      "input_tokens": 102835,
+      "output_tokens": 3012,
+      "reasoning_tokens": 759,
+      "cached_tokens": 77184,
+      "cache_input_tokens": 102835,
+      "cache_percent": 75.1,
+      "latency_ms": 9077,
+      "retries": 1
+    },
+    {
+      "key": "product",
+      "calls": 11,
+      "total_tokens": 102573,
+      "input_tokens": 98969,
+      "output_tokens": 3604,
+      "reasoning_tokens": 860,
+      "cached_tokens": 71424,
+      "cache_input_tokens": 98969,
+      "cache_percent": 72.2,
+      "latency_ms": 13775,
+      "retries": 0
+    }
+  ],
+  "by_purpose": [
+    {
+      "key": "work",
+      "calls": 112,
+      "total_tokens": 2122649,
+      "input_tokens": 2075801,
+      "output_tokens": 46848,
+      "reasoning_tokens": 14553,
+      "cached_tokens": 1707904,
+      "cache_input_tokens": 2075801,
+      "cache_percent": 82.3,
+      "latency_ms": 14119,
+      "retries": 2
+    },
+    {
+      "key": "coordination",
+      "calls": 31,
+      "total_tokens": 604644,
+      "input_tokens": 596046,
+      "output_tokens": 8598,
+      "reasoning_tokens": 2793,
+      "cached_tokens": 465536,
+      "cache_input_tokens": 596046,
+      "cache_percent": 78.1,
+      "latency_ms": 11966,
+      "retries": 0
+    },
+    {
+      "key": "review",
+      "calls": 55,
+      "total_tokens": 246900,
+      "input_tokens": 239735,
+      "output_tokens": 7165,
+      "reasoning_tokens": 0,
+      "cached_tokens": 6528,
+      "cache_input_tokens": 239735,
+      "cache_percent": 2.7,
+      "latency_ms": 4857,
+      "retries": 10
+    },
+    {
+      "key": "summary",
+      "calls": 1,
+      "total_tokens": 2005,
+      "input_tokens": 1814,
+      "output_tokens": 191,
+      "reasoning_tokens": 0,
+      "cached_tokens": 0,
+      "cache_input_tokens": 1814,
+      "cache_percent": 0.0,
+      "latency_ms": 5079,
+      "retries": 0
+    }
+  ],
+  "by_task": [
+    {
+      "key": null,
+      "calls": 61,
+      "total_tokens": 916760,
+      "input_tokens": 897876,
+      "output_tokens": 18884,
+      "reasoning_tokens": 5757,
+      "cached_tokens": 654464,
+      "cache_input_tokens": 897876,
+      "cache_percent": 72.9,
+      "latency_ms": 10864,
+      "retries": 1
+    },
+    {
+      "key": "leader:e2e-category-test",
+      "calls": 54,
+      "total_tokens": 901406,
+      "input_tokens": 883298,
+      "output_tokens": 18108,
+      "reasoning_tokens": 5138,
+      "cached_tokens": 661504,
+      "cache_input_tokens": 883298,
+      "cache_percent": 74.9,
+      "latency_ms": 13209,
+      "retries": 6
+    },
+    {
+      "key": "leader:frontend-category",
+      "calls": 48,
+      "total_tokens": 799714,
+      "input_tokens": 784130,
+      "output_tokens": 15584,
+      "reasoning_tokens": 4352,
+      "cached_tokens": 602880,
+      "cache_input_tokens": 784130,
+      "cache_percent": 76.9,
+      "latency_ms": 10507,
+      "retries": 3
+    },
+    {
+      "key": "leader:backend-category",
+      "calls": 25,
+      "total_tokens": 255745,
+      "input_tokens": 249123,
+      "output_tokens": 6622,
+      "reasoning_tokens": 1239,
+      "cached_tokens": 189696,
+      "cache_input_tokens": 249123,
+      "cache_percent": 76.1,
+      "latency_ms": 7705,
+      "retries": 2
+    },
+    {
+      "key": "leader:category-contract",
+      "calls": 11,
+      "total_tokens": 102573,
+      "input_tokens": 98969,
+      "output_tokens": 3604,
+      "reasoning_tokens": 860,
+      "cached_tokens": 71424,
+      "cache_input_tokens": 98969,
+      "cache_percent": 72.2,
+      "latency_ms": 13775,
+      "retries": 0
+    }
+  ],
+  "by_model": [
+    {
+      "key": "qwen3.7-max",
+      "calls": 144,
+      "total_tokens": 2729298,
+      "input_tokens": 2673661,
+      "output_tokens": 55637,
+      "reasoning_tokens": 17346,
+      "cached_tokens": 2173440,
+      "cache_input_tokens": 2673661,
+      "cache_percent": 81.3,
+      "latency_ms": 13593,
+      "retries": 2
+    },
+    {
+      "key": "qwen-flash",
+      "calls": 55,
+      "total_tokens": 246900,
+      "input_tokens": 239735,
+      "output_tokens": 7165,
+      "reasoning_tokens": 0,
+      "cached_tokens": 6528,
+      "cache_input_tokens": 239735,
+      "cache_percent": 2.7,
+      "latency_ms": 4857,
+      "retries": 10
+    }
+  ],
+  "approvals": {
+    "human": 2,
+    "automatic": 57,
+    "allow_all": 0,
+    "pending": 0
+  },
+  "tool_calls": {
+    "total": 174,
+    "failed": 25
+  }
+}

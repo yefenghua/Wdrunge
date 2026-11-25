@@ -1,0 +1,9 @@
+{
+  "started_at": "2026-11-14T04:30:42.011520+00:00",
+  "limit_seconds": 3000,
+  "model": "qwen3.7-max",
+  "review_model": "qwen-flash",
+  "scheduling": "async",
+  "context": "default fresh session",
+  "max_formal_reworks": 1
+}

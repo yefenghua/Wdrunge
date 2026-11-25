@@ -1,0 +1,4 @@
+{
+  "first_delivery": {"passed":false,"command":"python main.py --host 127.0.0.1 --port 18180","error":"ModuleNotFoundError: No module named fastapi","notes":"README omitted backend environment and dependency installation; inaccurate React, SQLAlchemy and DATABASE_URL claims"},
+  "rework_candidate": {"passed":true,"clean_directory":true,"steps":["python3 -m venv .venv","source .venv/bin/activate","pip install -r requirements.txt","python main.py --host 127.0.0.1 --port 18180"],"health":{"status":200,"body":{"status":"ok"}},"messages":{"status":200,"body":[]},"port_note":"Independent port used to avoid conflict; startup flags identical apart from port"}
+}

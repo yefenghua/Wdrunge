@@ -1,0 +1,14 @@
+请为现有电脑浏览器留言板 Web 网站增加分类和分类筛选，同步修改 SQLite 数据库、FastAPI 后端和 React 网页，不增加客户端。
+
+分类只有 general（日常）和 feedback（反馈）。发布时可选，默认日常，列表显示分类。可筛选“全部”“日常”“反馈”，默认全部，无匹配时显示提示。不需要修改已有留言分类。分类保存到 SQLite；旧留言默认日常，不能丢失；后端拒绝非法分类。保留发布及删除功能，筛选后删除只影响目标留言。先形成几行字段、默认值和接口约定，再实现并检查。
+
+调度规则：异步。先确定接口约定，然后允许前后端任务并行，不等待后端完成才开始前端。
+保持默认上下文管理，使用新会话；不填充历史、不修改上下文阈值。
+
+验收：
+1. 构建和启动成功；分类选择、显示、三种筛选及筛选后删除正确，接口约定一致。
+2. 默认值、非法分类、旧数据兼容和持久化正确，原有发布删除正常。
+
+已验证环境，无需重装。源项目后端解释器准确路径：/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/guestbook/runs/R2b/workspace/backend/.venv/bin/python。隔离任务副本可能没有自己的 .venv；在任务的 backend cwd 中使用这个已安装解释器，平台允许只读复用源项目依赖，不查找 backend/env 或重新安装 Python。通过已登记的 backend 服务命令启动 app.main:app，端口8100、健康接口/api/health，keep_running=true。使用平台 WDRUNGE_DATA_DIR 中的 app.db；原有旧数据库已放好。前端 cwd=frontend，npm run dev -- --host 127.0.0.1，端口15173；npm run build。npm scripts 已使用 Vite runner，cacheDir=.vite-cache，node_modules 只读共享，不删除、不重装。内置浏览器和 Chromium 已就绪；电脑端1440×900。异步页面更新需等待目标内容显示后再断言。
+
+总上限50分钟，最多正式返工1次；只实现本次分类及筛选，不增加Markdown、搜索、编辑或其他后续目标。已有基础功能不要求重做，不开发手机端。不重复已通过且未受修改影响的检查。完成后简短交付并停止，不自行安排下一阶段。

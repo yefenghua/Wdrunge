@@ -1,0 +1,47 @@
+[
+  {
+    "case": "R1",
+    "type": "ordinary_task",
+    "functional_success": true,
+    "overall_run_success": true,
+    "formal_reworks": 1,
+    "final_acceptance_seconds": 3591.484639,
+    "total_tokens": 4580414,
+    "model_calls": 300,
+    "tool_calls": {
+      "total": 251,
+      "failed": 55
+    },
+    "evidence": "../traces/R1/metrics.json"
+  },
+  {
+    "case": "R2b",
+    "type": "changed_request",
+    "functional_success": true,
+    "overall_run_success": true,
+    "formal_reworks": 0,
+    "final_acceptance_seconds": 1885.89648,
+    "total_tokens": 2976198,
+    "model_calls": 199,
+    "tool_calls": {
+      "total": 174,
+      "failed": 25
+    },
+    "evidence": "../traces/R2b/metrics.json"
+  },
+  {
+    "case": "R3",
+    "type": "failure_case",
+    "functional_success": true,
+    "overall_run_success": false,
+    "formal_reworks": 1,
+    "final_acceptance_seconds": 1582.300176,
+    "total_tokens": 2487880,
+    "model_calls": 152,
+    "tool_calls": {
+      "total": 139,
+      "failed": 31
+    },
+    "evidence": "../traces/R3/metrics.json"
+  }
+]

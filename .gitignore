@@ -1,4 +1,24 @@
 .DS_Store
 
-# Durable isolated collaboration runs (local recoverable task state)
+# Durable isolated collaboration runs
 .wdrunge-runs/
+
+# Local configuration and generated state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+dist/
+*.log

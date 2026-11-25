@@ -1,0 +1,499 @@
+{
+  "run": "R2b",
+  "started_at": "2026-11-14T04:30:42.011520+00:00",
+  "limit_seconds": 3000,
+  "first_delivery": {
+    "at": "2026-11-14T05:01:54.533605+00:00",
+    "elapsed_seconds": 1872.544217250077,
+    "reason": "delivered"
+  },
+  "final_acceptance_seconds": 1885.89648,
+  "first_functional_success": true,
+  "functional_success": true,
+  "scope_control_passed": true,
+  "schedule_compliance": true,
+  "within_budget": true,
+  "overall_run_success": true,
+  "formal_reworks": 0,
+  "model_calls": 199,
+  "cache_reporting_calls": 199,
+  "context_compactions": [
+    {
+      "stage": "ingest",
+      "record": {
+        "id": "1cb1d3be29954eeaaa1cfee014ac95c6",
+        "stage": "ingest",
+        "agent_id": "product",
+        "start_id": "76136ec2-1468-4ca7-97bc-7f9c38576137",
+        "end_id": "76136ec2-1468-4ca7-97bc-7f9c38576137",
+        "source_ids": [
+          "76136ec2-1468-4ca7-97bc-7f9c38576137"
+        ],
+        "before_tokens": 50,
+        "after_tokens": 131,
+        "source": [
+          {
+            "type": "tool",
+            "data": {
+              "content": "{\"entries\": [{\"name\": \"backend\", \"type\": \"directory\"}], \"next_offset\": null}",
+              "additional_kwargs": {},
+              "response_metadata": {},
+              "type": "tool",
+              "name": "browse_directory",
+              "id": "76136ec2-1468-4ca7-97bc-7f9c38576137",
+              "tool_call_id": "call_3fe4ec0f6c2d425e81d392f6",
+              "artifact": null,
+              "status": "success"
+            }
+          }
+        ],
+        "replacement": [
+          {
+            "type": "tool",
+            "data": {
+              "content": "{\"unchanged\": true, \"target\": {\"path\": \"docs\"}, \"note\": \"Identical to your earlier browse_directory result for the same arguments, which is still shown above in this context; it is not repeated. Repeat the same call to receive it again.\"}",
+              "additional_kwargs": {
+                "fold": {
+                  "level": 0,
+                  "tokens": 131,
+                  "characters": 238,
+                  "complete": true,
+                  "digest": "9ef36c5399237a07",
+                  "unchanged_of": "d7e32fb3-d138-4dd8-b709-074e5031407c"
+                }
+              },
+              "response_metadata": {},
+              "type": "tool",
+              "name": "browse_directory",
+              "id": "76136ec2-1468-4ca7-97bc-7f9c38576137",
+              "tool_call_id": "call_3fe4ec0f6c2d425e81d392f6",
+              "artifact": null,
+              "status": "success"
+            }
+          }
+        ]
+      },
+      "at": "2026-11-14 04:32:50.601777"
+    },
+    {
+      "stage": "ingest",
+      "record": {
+        "id": "73f18a16848a45d8a177c224bca9b103",
+        "stage": "ingest",
+        "agent_id": "frontend",
+        "start_id": "ba7905af-d132-43c8-8c96-3fa67927589c",
+        "end_id": "ba7905af-d132-43c8-8c96-3fa67927589c",
+        "source_ids": [
+          "ba7905af-d132-43c8-8c96-3fa67927589c"
+        ],
+        "before_tokens": 1155,
+        "after_tokens": 141,
+        "source": [
+          {
+            "type": "tool",
+            "data": {
+              "content": ":root {\n  font-family: system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  color: #172033;\n  background: #f0f2f5;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n}\n\n.app {\n  width: min(640px, calc(100% - 32px));\n  margin: 40px auto;\n  padding: 0 0 40px;\n}\n\n.app-title {\n  text-align: center;\n  margin: 0 0 24px;\n  font-size: 28px;\n  color: #1a1a1a;\n}\n\n.form-card {\n  background: #fff;\n  border-radius: 8px;\n  padding: 20px;\n  margin-bottom: 24px;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);\n}\n\n.form-group {\n  margin-bottom: 14px;\n}\n\n.form-group label {\n  display: block;\n  font-size: 14px;\n  margin-bottom: 4px;\n  color: #333;\n}\n\n.form-group input,\n.form-group textarea {\n  width: 100%;\n  padding: 8px 12px;\n  border: 1px solid #ccc;\n  border-radius: 4px;\n  font-size: 14px;\n  font-family: inherit;\n  resize: vertical;\n}\n\n.form-group textarea {\n  min-height: 80px;\n}\n\n.form-group input:focus,\n.form-group textarea:focus {\n  outline: none;\n  border-color: #1677ff;\n  box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.15);\n}\n\n.submit-btn {\n  display: block;\n  width: 100%;\n  padding: 10px;\n  background: #1677ff;\n  color: #fff;\n  border: none;\n  border-radius: 4px;\n  font-size: 16px;\n  cursor: pointer;\n}\n\n.submit-btn:hover {\n  background: #4096ff;\n}\n\n.submit-btn:disabled {\n  background: #91caff;\n  cursor: not-allowed;\n}\n\n.error-msg {\n  color: #ff4d4f;\n  font-size: 13px;\n  margin-top: -8px;\n  margin-bottom: 12px;\n}\n\n.message-list {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.message-card {\n  background: #fff;\n  border-radius: 8px;\n  padding: 16px 20px;\n  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);\n}\n\n.message-header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 8px;\n}\n\n.message-nickname {\n  font-weight: 600;\n  font-size: 15px;\n  color: #1a1a1a;\n}\n\n.delete-btn {\n  background: none;\n  border: 1px solid #d9d9d9;\n  border-radius: 4px;\n  color: #999;\n  font-size: 12px;\n  padding: 2px 8px;\n  cursor: pointer;\n}\n\n.delete-btn:hover {\n  color: #ff4d4f;\n  border-color: #ff4d4f;\n}\n\n.message-content {\n  font-size: 14px;\n  color: #333;\n  line-height: 1.6;\n  white-space: pre-wrap;\n  word-break: break-word;\n}\n\n.empty-tip {\n  text-align: center;\n  color: #999;\n  font-size: 14px;\n  padding: 40px 0;\n}\n",
+              "additional_kwargs": {},
+              "response_metadata": {},
+              "type": "tool",
+              "name": "read_project_file",
+              "id": "ba7905af-d132-43c8-8c96-3fa67927589c",
+              "tool_call_id": "call_c0fcaa760e74468ba5e071a4",
+              "artifact": null,
+              "status": "success"
+            }
+          }
+        ],
+        "replacement": [
+          {
+            "type": "tool",
+            "data": {
+              "content": "{\"unchanged\": true, \"target\": {\"path\": \"frontend/src/styles.css\"}, \"note\": \"Identical to your earlier read_project_file result for the same arguments, which is still shown above in this context; it is not repeated. Repeat the same call to receive it again.\"}",
+              "additional_kwargs": {
+                "fold": {
+                  "level": 0,
+                  "tokens": 141,
+                  "characters": 258,
+                  "complete": true,
+                  "digest": "5d44cb4ac7f7256e",
+                  "unchanged_of": "428dabb0-976d-4cc1-a04b-79ff17f324a5"
+                }
+              },
+              "response_metadata": {},
+              "type": "tool",
+              "name": "read_project_file",
+              "id": "ba7905af-d132-43c8-8c96-3fa67927589c",
+              "tool_call_id": "call_c0fcaa760e74468ba5e071a4",
+              "artifact": null,
+              "status": "success"
+            }
+          }
+        ]
+      },
+      "at": "2026-11-14 04:36:38.228338"
+    }
+  ],
+  "task_intervals": [
+    {
+      "id": "leader:category-contract",
+      "role": "product",
+      "summary": "编写分类接口约定文档",
+      "created": 1794630753.889774,
+      "first_tool": 1794630761.870523,
+      "accepted": 1794630923.8871858,
+      "state": "completed"
+    },
+    {
+      "id": "leader:backend-category",
+      "role": "backend",
+      "summary": "后端实现分类功能（数据库+API）",
+      "created": 1794630943.218302,
+      "first_tool": 1794630944.488415,
+      "accepted": 1794631182.3676019,
+      "state": "completed"
+    },
+    {
+      "id": "leader:frontend-category",
+      "role": "frontend",
+      "summary": "前端实现分类选择、显示和筛选功能",
+      "created": 1794630943.2359219,
+      "first_tool": 1794630949.34386,
+      "accepted": 1794631579.101971,
+      "state": "completed"
+    },
+    {
+      "id": "leader:e2e-category-test",
+      "role": "testing",
+      "summary": "端到端验收分类功能",
+      "created": 1794631602.777419,
+      "first_tool": 1794631623.18609,
+      "accepted": 1794632483.036881,
+      "state": "completed"
+    }
+  ],
+  "observable_implementation_overlap_seconds": 233.0237419605255,
+  "usage": {
+    "conversation_id": "41199a8d-bf78-4903-bebf-dbca52412f0a",
+    "totals": {
+      "key": null,
+      "calls": 199,
+      "total_tokens": 2976198,
+      "input_tokens": 2913396,
+      "output_tokens": 62802,
+      "reasoning_tokens": 17346,
+      "cached_tokens": 2179968,
+      "cache_input_tokens": 2913396,
+      "cache_percent": 74.8,
+      "latency_ms": 11178,
+      "retries": 12
+    },
+    "by_agent": [
+      {
+        "key": "frontend",
+        "calls": 36,
+        "total_tokens": 778787,
+        "input_tokens": 763586,
+        "output_tokens": 15201,
+        "reasoning_tokens": 5237,
+        "cached_tokens": 627072,
+        "cache_input_tokens": 763586,
+        "cache_percent": 82.1,
+        "latency_ms": 13086,
+        "retries": 0
+      },
+      {
+        "key": "testing",
+        "calls": 28,
+        "total_tokens": 768621,
+        "input_tokens": 753986,
+        "output_tokens": 14635,
+        "reasoning_tokens": 5138,
+        "cached_tokens": 656896,
+        "cache_input_tokens": 753986,
+        "cache_percent": 87.1,
+        "latency_ms": 20583,
+        "retries": 0
+      },
+      {
+        "key": "leader",
+        "calls": 32,
+        "total_tokens": 606649,
+        "input_tokens": 597860,
+        "output_tokens": 8789,
+        "reasoning_tokens": 2793,
+        "cached_tokens": 465536,
+        "cache_input_tokens": 597860,
+        "cache_percent": 77.9,
+        "latency_ms": 11751,
+        "retries": 0
+      },
+      {
+        "key": "backend",
+        "calls": 26,
+        "total_tokens": 366821,
+        "input_tokens": 356425,
+        "output_tokens": 10396,
+        "reasoning_tokens": 2559,
+        "cached_tokens": 275328,
+        "cache_input_tokens": 356425,
+        "cache_percent": 77.2,
+        "latency_ms": 10868,
+        "retries": 1
+      },
+      {
+        "key": "reviewer",
+        "calls": 55,
+        "total_tokens": 246900,
+        "input_tokens": 239735,
+        "output_tokens": 7165,
+        "reasoning_tokens": 0,
+        "cached_tokens": 6528,
+        "cache_input_tokens": 239735,
+        "cache_percent": 2.7,
+        "latency_ms": 4857,
+        "retries": 10
+      },
+      {
+        "key": "designer",
+        "calls": 11,
+        "total_tokens": 105847,
+        "input_tokens": 102835,
+        "output_tokens": 3012,
+        "reasoning_tokens": 759,
+        "cached_tokens": 77184,
+        "cache_input_tokens": 102835,
+        "cache_percent": 75.1,
+        "latency_ms": 9077,
+        "retries": 1
+      },
+      {
+        "key": "product",
+        "calls": 11,
+        "total_tokens": 102573,
+        "input_tokens": 98969,
+        "output_tokens": 3604,
+        "reasoning_tokens": 860,
+        "cached_tokens": 71424,
+        "cache_input_tokens": 98969,
+        "cache_percent": 72.2,
+        "latency_ms": 13775,
+        "retries": 0
+      }
+    ],
+    "by_purpose": [
+      {
+        "key": "work",
+        "calls": 112,
+        "total_tokens": 2122649,
+        "input_tokens": 2075801,
+        "output_tokens": 46848,
+        "reasoning_tokens": 14553,
+        "cached_tokens": 1707904,
+        "cache_input_tokens": 2075801,
+        "cache_percent": 82.3,
+        "latency_ms": 14119,
+        "retries": 2
+      },
+      {
+        "key": "coordination",
+        "calls": 31,
+        "total_tokens": 604644,
+        "input_tokens": 596046,
+        "output_tokens": 8598,
+        "reasoning_tokens": 2793,
+        "cached_tokens": 465536,
+        "cache_input_tokens": 596046,
+        "cache_percent": 78.1,
+        "latency_ms": 11966,
+        "retries": 0
+      },
+      {
+        "key": "review",
+        "calls": 55,
+        "total_tokens": 246900,
+        "input_tokens": 239735,
+        "output_tokens": 7165,
+        "reasoning_tokens": 0,
+        "cached_tokens": 6528,
+        "cache_input_tokens": 239735,
+        "cache_percent": 2.7,
+        "latency_ms": 4857,
+        "retries": 10
+      },
+      {
+        "key": "summary",
+        "calls": 1,
+        "total_tokens": 2005,
+        "input_tokens": 1814,
+        "output_tokens": 191,
+        "reasoning_tokens": 0,
+        "cached_tokens": 0,
+        "cache_input_tokens": 1814,
+        "cache_percent": 0.0,
+        "latency_ms": 5079,
+        "retries": 0
+      }
+    ],
+    "by_task": [
+      {
+        "key": null,
+        "calls": 61,
+        "total_tokens": 916760,
+        "input_tokens": 897876,
+        "output_tokens": 18884,
+        "reasoning_tokens": 5757,
+        "cached_tokens": 654464,
+        "cache_input_tokens": 897876,
+        "cache_percent": 72.9,
+        "latency_ms": 10864,
+        "retries": 1
+      },
+      {
+        "key": "leader:e2e-category-test",
+        "calls": 54,
+        "total_tokens": 901406,
+        "input_tokens": 883298,
+        "output_tokens": 18108,
+        "reasoning_tokens": 5138,
+        "cached_tokens": 661504,
+        "cache_input_tokens": 883298,
+        "cache_percent": 74.9,
+        "latency_ms": 13209,
+        "retries": 6
+      },
+      {
+        "key": "leader:frontend-category",
+        "calls": 48,
+        "total_tokens": 799714,
+        "input_tokens": 784130,
+        "output_tokens": 15584,
+        "reasoning_tokens": 4352,
+        "cached_tokens": 602880,
+        "cache_input_tokens": 784130,
+        "cache_percent": 76.9,
+        "latency_ms": 10507,
+        "retries": 3
+      },
+      {
+        "key": "leader:backend-category",
+        "calls": 25,
+        "total_tokens": 255745,
+        "input_tokens": 249123,
+        "output_tokens": 6622,
+        "reasoning_tokens": 1239,
+        "cached_tokens": 189696,
+        "cache_input_tokens": 249123,
+        "cache_percent": 76.1,
+        "latency_ms": 7705,
+        "retries": 2
+      },
+      {
+        "key": "leader:category-contract",
+        "calls": 11,
+        "total_tokens": 102573,
+        "input_tokens": 98969,
+        "output_tokens": 3604,
+        "reasoning_tokens": 860,
+        "cached_tokens": 71424,
+        "cache_input_tokens": 98969,
+        "cache_percent": 72.2,
+        "latency_ms": 13775,
+        "retries": 0
+      }
+    ],
+    "by_model": [
+      {
+        "key": "qwen3.7-max",
+        "calls": 144,
+        "total_tokens": 2729298,
+        "input_tokens": 2673661,
+        "output_tokens": 55637,
+        "reasoning_tokens": 17346,
+        "cached_tokens": 2173440,
+        "cache_input_tokens": 2673661,
+        "cache_percent": 81.3,
+        "latency_ms": 13593,
+        "retries": 2
+      },
+      {
+        "key": "qwen-flash",
+        "calls": 55,
+        "total_tokens": 246900,
+        "input_tokens": 239735,
+        "output_tokens": 7165,
+        "reasoning_tokens": 0,
+        "cached_tokens": 6528,
+        "cache_input_tokens": 239735,
+        "cache_percent": 2.7,
+        "latency_ms": 4857,
+        "retries": 10
+      }
+    ],
+    "approvals": {
+      "human": 2,
+      "automatic": 57,
+      "allow_all": 0,
+      "pending": 0
+    },
+    "tool_calls": {
+      "total": 174,
+      "failed": 25
+    }
+  },
+  "operator_business_edits": false,
+  "approval_intervention_log": "evidence/operator-approvals.json when present",
+  "first_acceptance": {
+    "at": "2026-11-14T05:02:07.908Z",
+    "all_passed": true,
+    "groups": [
+      {
+        "group": "build_and_start",
+        "passed": true
+      },
+      {
+        "group": "migration_default_invalid",
+        "passed": true
+      },
+      {
+        "group": "browser_category_filters_delete",
+        "passed": true
+      },
+      {
+        "group": "reload_restart_persistence",
+        "passed": true
+      }
+    ],
+    "service_logs": [
+      "INFO:     Started server process [40464]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:64545 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64545 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64550 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64545 - \"POST /api/messages HTTP/1.1\" 422 Unprocessable Content\nINFO:     127.0.0.1:64550 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64559 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64560 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64562 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64563 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64564 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64565 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64568 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64570 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64545 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64575 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64576 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64577 - \"GET /api/messages?category=general HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64579 - \"GET /api/messages?category=general HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64581 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64583 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64586 - \"DELETE /api/messages/4 HTTP/1.1\" 204 No Content\nINFO:     127.0.0.1:64588 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64590 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64592 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [40464]\n",
+      "\n> todo-experiment-frontend@0.1.0 dev\n> vite --configLoader runner --host 127.0.0.1 --port 15173 --strictPort\n\n1:02:00 PM [vite] (client) Re-optimizing dependencies because vite config has changed\n\n  VITE v8.3.8  ready in 211 ms\n\n  ➜  Local:   http://127.0.0.1:15173/\n",
+      "INFO:     Started server process [40518]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:64597 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64602 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64603 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64597 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [40518]\n"
+    ]
+  },
+  "final_acceptance": {
+    "at": "2026-11-14T05:02:07.908Z",
+    "all_passed": true,
+    "groups": [
+      {
+        "group": "build_and_start",
+        "passed": true
+      },
+      {
+        "group": "migration_default_invalid",
+        "passed": true
+      },
+      {
+        "group": "browser_category_filters_delete",
+        "passed": true
+      },
+      {
+        "group": "reload_restart_persistence",
+        "passed": true
+      }
+    ],
+    "service_logs": [
+      "INFO:     Started server process [40464]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:64545 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64545 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64550 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64545 - \"POST /api/messages HTTP/1.1\" 422 Unprocessable Content\nINFO:     127.0.0.1:64550 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64559 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64560 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64562 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64563 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64564 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64565 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64568 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64570 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64545 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:64575 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64576 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64577 - \"GET /api/messages?category=general HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64579 - \"GET /api/messages?category=general HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64581 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64583 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64586 - \"DELETE /api/messages/4 HTTP/1.1\" 204 No Content\nINFO:     127.0.0.1:64588 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64590 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64592 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [40464]\n",
+      "\n> todo-experiment-frontend@0.1.0 dev\n> vite --configLoader runner --host 127.0.0.1 --port 15173 --strictPort\n\n1:02:00 PM [vite] (client) Re-optimizing dependencies because vite config has changed\n\n  VITE v8.3.8  ready in 211 ms\n\n  ➜  Local:   http://127.0.0.1:15173/\n",
+      "INFO:     Started server process [40518]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:64597 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64602 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64603 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:64597 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [40518]\n"
+    ]
+  }
+}

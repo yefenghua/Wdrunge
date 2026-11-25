@@ -1,0 +1,182 @@
+[
+  {
+    "path": "evaluation/traces/R1/metrics.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/metrics.json",
+    "sha256": "ddf917f8eaf5bcb736c14e7d37dc611363a9458299551ad5db77a82a4e849fd1"
+  },
+  {
+    "path": "evaluation/traces/R1/original-input.txt",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/evidence/prompt.md",
+    "sha256": "21785b996eee4c38da766cf48c94f4db83d3ddd023186d3958539fead4c0157e"
+  },
+  {
+    "path": "evaluation/traces/R1/acceptance.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/acceptance-final/result.json",
+    "sha256": "1264c3fc8a35a324705e06fea60503742f90d06a892c04f51da882711677751c"
+  },
+  {
+    "path": "evaluation/traces/R1/desktop.png",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/acceptance-final/desktop.png",
+    "sha256": "ecd8122885ec3245e705f7522aa4ee36f59c6534534a21aae3f3a4a208bf6009"
+  },
+  {
+    "path": "evaluation/traces/R1/timing.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/evidence/timing.json",
+    "sha256": "5dd9104279fcd2593de0b1a40bb4f16012937cecd4fb70e2e305aa2034577c9d"
+  },
+  {
+    "path": "evaluation/traces/R1/usage-closed.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/evidence/usage-closed.json",
+    "sha256": "1b20a7299a704f4162c6797f430f209cb3d47fcc4d70b3a303a8b1e5c8cc02f8"
+  },
+  {
+    "path": "evaluation/traces/R1/rework-request.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/evidence/rework-request.json",
+    "sha256": "17c00be13169ddcc07f064b5d77db93d14ea083456b966d8cd6021a14587fc48"
+  },
+  {
+    "path": "evaluation/traces/R1/documentation-check.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R1-实验结果/documentation-check.json",
+    "sha256": "b467c76a1a8966f30e76a3c25bd9a2c93c35f86285128371b1cc39278a90e924"
+  },
+  {
+    "path": "evaluation/traces/R2b/metrics.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/metrics.json",
+    "sha256": "dfdce6048312016367c9ed7e737fc9164f892fdec5a1091162ebcf698b14c8b4"
+  },
+  {
+    "path": "evaluation/traces/R2b/original-input.txt",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/evidence/prompt.md",
+    "sha256": "6d5cd029158f68747440c693c3a15c11de95aa1a66a8eb25cdc19db929b3078e"
+  },
+  {
+    "path": "evaluation/traces/R2b/acceptance.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/acceptance/result.json",
+    "sha256": "a031e3db3078dea5ef514e7b2b52befb4c0acfa295dd4fd41982a7bb1bd830f8"
+  },
+  {
+    "path": "evaluation/traces/R2b/build.log",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/acceptance/build.log",
+    "sha256": "08cbaa559559f29ca096ccb637372ff304fa1021eb3e48c83a83d9159daf2fd2"
+  },
+  {
+    "path": "evaluation/traces/R2b/desktop.png",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/acceptance/desktop.png",
+    "sha256": "8512e07066e0d15f4f3a9ff2f2bf3d607d93f1125dda70f56a9d0487a1bcab9d"
+  },
+  {
+    "path": "evaluation/traces/R2b/timing.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/evidence/timing.json",
+    "sha256": "42f385f79d8b2f30e1d6700f8b9a569eed8fe736ad2a4dbf53c846bdc24154bb"
+  },
+  {
+    "path": "evaluation/traces/R2b/usage-closed.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/evidence/usage-closed.json",
+    "sha256": "7279e3ad05e8d72819a9e25b8a298b420e77d6e734dfcc087c926131f6466ba1"
+  },
+  {
+    "path": "evaluation/traces/R2b/execution-closed.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R2b-实验结果/evidence/execution-closed.json",
+    "sha256": "4e09ccd4f9fc74905daaee0f0048b8c713e76d6888101261d725b388f912f6f8"
+  },
+  {
+    "path": "evaluation/traces/R3/metrics.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/metrics.json",
+    "sha256": "9849d4d2590305ac95ef5db5184a9132aa2c2af695e4b8944d4894ba9ba10259"
+  },
+  {
+    "path": "evaluation/traces/R3/original-input.txt",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/prompt.md",
+    "sha256": "81b74b9188284be5cfa5c4bf13a4b0970f1347df58dcd25e606b3d9c745d0c93"
+  },
+  {
+    "path": "evaluation/traces/R3/acceptance.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/acceptance/result.json",
+    "sha256": "2cec6c35fe1d42088828705ee620715ea7f60c13952470efbd9f2133b5a71ddd"
+  },
+  {
+    "path": "evaluation/traces/R3/build.log",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/acceptance/build.log",
+    "sha256": "7bd2f1bb70523fd94d3e6e0e703dc68a265fd28e7961ddbb5a6da22215c9960a"
+  },
+  {
+    "path": "evaluation/traces/R3/timing.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/timing.json",
+    "sha256": "6ca70158ce76b802437a119ced7a8ea364c8db48d68d73fbe183c4522f906a6f"
+  },
+  {
+    "path": "evaluation/traces/R3/usage-closed.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/usage-closed.json",
+    "sha256": "3b1467f6acc97e622e0e4c66f84c9e34c5c1d4f0929a11ded4f2a8140f6f2a9b"
+  },
+  {
+    "path": "evaluation/traces/R3/execution-closed.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/execution-closed.json",
+    "sha256": "4e09ccd4f9fc74905daaee0f0048b8c713e76d6888101261d725b388f912f6f8"
+  },
+  {
+    "path": "evaluation/traces/R3/rework-request.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/rework-request.json",
+    "sha256": "f9a04cf67ffefbca6772a0d01d97c5dae871b99089963854a44feed2275698e0"
+  },
+  {
+    "path": "evaluation/traces/R3/scope-anomaly.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/evidence/scope-anomaly.json",
+    "sha256": "2116fa461fabb58825130fcaaf7b8d122d5a61719dfbe1a7f4c188e32587f5d6"
+  },
+  {
+    "path": "evaluation/traces/R3/first-acceptance.json",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/outputs/R3-实验结果/acceptance-first/result.json",
+    "sha256": "8fae4541c04536cc31601421ea557c12dbe2a1fda2ed5d687c6233b011871523"
+  },
+  {
+    "path": "evaluation/scripts/guestbook-r1.mjs",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-r1.mjs",
+    "sha256": "6d121ba59a794934c068b0a4a5bc7159ab3d67dc60edee39948bd900addfa0be"
+  },
+  {
+    "path": "evaluation/scripts/guestbook-pair-b.mjs",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-pair-b.mjs",
+    "sha256": "94c09d93e39935a34a196648b33778d13cbe2ee0f475be10f90c41f93d30db3e"
+  },
+  {
+    "path": "evaluation/scripts/guestbook-r3.mjs",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-r3.mjs",
+    "sha256": "c501eaf0ba7f49d168249a013812b2a03d690aa3bf011711870f062ea4f33b7d"
+  },
+  {
+    "path": "evaluation/scripts/guestbook-r3-targeted.mjs",
+    "source_archive": "Wdrunge_2026-11_会话与测试证据.zip",
+    "archive_member": "evidence/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-r3-targeted.mjs",
+    "sha256": "a61f8147cda0de4c08cdfef73edd63b1a2966299ade111dde0f9adcf0754ff69"
+  }
+]

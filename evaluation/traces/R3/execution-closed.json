@@ -1,0 +1,7 @@
+{
+  "running": false,
+  "stopping": false,
+  "paused": false,
+  "pending_tasks": 0,
+  "active_goals": 0
+}

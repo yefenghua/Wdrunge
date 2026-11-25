@@ -1,0 +1,321 @@
+{
+  "functional_success": true,
+  "scope_control_passed": false,
+  "overall_run_success": false,
+  "out_of_scope_task": {"id":"leader:r4-backend-markdown","operator_stopped":true,"attributed_tokens":138877,"notes":"Not requested by the user; includes only explicitly task-attributed usage, not all coordination overhead; excluded from website delivery, included in total usage"},
+  "serial_compliance": true,
+  "backend_accepted_epoch": 1794624543.770205,
+  "frontend_first_tool_epoch": 1794624562.001327,
+  "started_at": "2026-11-14T02:40:39.047824+00:00",
+  "first_delivery_seconds": 1074.3954986669123,
+  "final_acceptance_seconds": 1582.300176,
+  "acceptance_at": "2026-11-14T03:07:01.348Z",
+  "first_success": false,
+  "final_success": true,
+  "acceptance_groups_passed": 4,
+  "acceptance_groups_total": 4,
+  "criteria_passed": 2,
+  "formal_reworks": 1,
+  "environment_assisted": true,
+  "cache_reporting_calls": 152,
+  "model_calls": 152,
+  "context_compactions": [
+    {
+      "stage": "ingest",
+      "agent": "backend",
+      "before_tokens": 764,
+      "after_tokens": 144,
+      "at": "2026-11-14 02:46:28.699538"
+    },
+    {
+      "stage": "fold",
+      "agent": "backend",
+      "before_tokens": 13908,
+      "after_tokens": 2652,
+      "at": "2026-11-14 02:47:19.096255"
+    },
+    {
+      "stage": "ingest",
+      "agent": "frontend",
+      "before_tokens": 156,
+      "after_tokens": 133,
+      "at": "2026-11-14 02:49:34.103116"
+    }
+  ],
+  "task_intervals": [
+    {
+      "request_id": "leader:r3-backend-category",
+      "role": "backend",
+      "created": 1794624077.496056,
+      "first_tool": 1794624087.164292,
+      "accepted": 1794624543.770205,
+      "note": "first_tool is an observable activity bound, not exact model execution start"
+    },
+    {
+      "request_id": "leader:r3-frontend-category",
+      "role": "frontend",
+      "created": 1794624556.7325099,
+      "first_tool": 1794624562.001327,
+      "accepted": 1794625006.129048,
+      "note": "first_tool is an observable activity bound, not exact model execution start"
+    },
+    {
+      "request_id": "leader:4aa9e7e0b38640b6b545528b242ea2fd",
+      "role": "frontend",
+      "created": 1794625305.69343,
+      "first_tool": 1794625311.658006,
+      "accepted": 1794625539.091094,
+      "note": "first_tool is an observable activity bound, not exact model execution start"
+    },
+    {
+      "request_id": "leader:r4-backend-markdown",
+      "role": "backend",
+      "created": 1794625558.049191,
+      "first_tool": 1794625564.983103,
+      "accepted": null,
+      "note": "first_tool is an observable activity bound, not exact model execution start"
+    }
+  ],
+  "usage": {
+    "conversation_id": "c22c076e-7b29-4781-8f9b-8f657d11f007",
+    "totals": {
+      "key": null,
+      "calls": 152,
+      "total_tokens": 2487880,
+      "input_tokens": 2435475,
+      "output_tokens": 52405,
+      "reasoning_tokens": 14906,
+      "cached_tokens": 1848704,
+      "cache_input_tokens": 2435475,
+      "cache_percent": 75.9,
+      "latency_ms": 10161,
+      "retries": 6
+    },
+    "by_agent": [
+      {
+        "key": "backend",
+        "calls": 46,
+        "total_tokens": 923390,
+        "input_tokens": 903557,
+        "output_tokens": 19833,
+        "reasoning_tokens": 4230,
+        "cached_tokens": 744192,
+        "cache_input_tokens": 903557,
+        "cache_percent": 82.4,
+        "latency_ms": 10948,
+        "retries": 0
+      },
+      {
+        "key": "frontend",
+        "calls": 42,
+        "total_tokens": 696614,
+        "input_tokens": 681698,
+        "output_tokens": 14916,
+        "reasoning_tokens": 5455,
+        "cached_tokens": 602496,
+        "cache_input_tokens": 681698,
+        "cache_percent": 88.4,
+        "latency_ms": 10507,
+        "retries": 0
+      },
+      {
+        "key": "leader",
+        "calls": 27,
+        "total_tokens": 693968,
+        "input_tokens": 681774,
+        "output_tokens": 12194,
+        "reasoning_tokens": 4454,
+        "cached_tokens": 470016,
+        "cache_input_tokens": 681774,
+        "cache_percent": 68.9,
+        "latency_ms": 15922,
+        "retries": 0
+      },
+      {
+        "key": "reviewer",
+        "calls": 31,
+        "total_tokens": 127891,
+        "input_tokens": 123674,
+        "output_tokens": 4217,
+        "reasoning_tokens": 0,
+        "cached_tokens": 896,
+        "cache_input_tokens": 123674,
+        "cache_percent": 0.7,
+        "latency_ms": 3927,
+        "retries": 6
+      },
+      {
+        "key": "testing",
+        "calls": 6,
+        "total_tokens": 46017,
+        "input_tokens": 44772,
+        "output_tokens": 1245,
+        "reasoning_tokens": 767,
+        "cached_tokens": 31104,
+        "cache_input_tokens": 44772,
+        "cache_percent": 69.5,
+        "latency_ms": 7984,
+        "retries": 0
+      }
+    ],
+    "by_purpose": [
+      {
+        "key": "work",
+        "calls": 94,
+        "total_tokens": 1666021,
+        "input_tokens": 1630027,
+        "output_tokens": 35994,
+        "reasoning_tokens": 10452,
+        "cached_tokens": 1377792,
+        "cache_input_tokens": 1630027,
+        "cache_percent": 84.5,
+        "latency_ms": 10562,
+        "retries": 0
+      },
+      {
+        "key": "coordination",
+        "calls": 25,
+        "total_tokens": 690094,
+        "input_tokens": 678222,
+        "output_tokens": 11872,
+        "reasoning_tokens": 4454,
+        "cached_tokens": 470016,
+        "cache_input_tokens": 678222,
+        "cache_percent": 69.3,
+        "latency_ms": 16638,
+        "retries": 0
+      },
+      {
+        "key": "review",
+        "calls": 31,
+        "total_tokens": 127891,
+        "input_tokens": 123674,
+        "output_tokens": 4217,
+        "reasoning_tokens": 0,
+        "cached_tokens": 896,
+        "cache_input_tokens": 123674,
+        "cache_percent": 0.7,
+        "latency_ms": 3927,
+        "retries": 6
+      },
+      {
+        "key": "summary",
+        "calls": 2,
+        "total_tokens": 3874,
+        "input_tokens": 3552,
+        "output_tokens": 322,
+        "reasoning_tokens": 0,
+        "cached_tokens": 0,
+        "cache_input_tokens": 3552,
+        "cache_percent": 0.0,
+        "latency_ms": 6968,
+        "retries": 0
+      }
+    ],
+    "by_task": [
+      {
+        "key": "leader:r3-backend-category",
+        "calls": 44,
+        "total_tokens": 819612,
+        "input_tokens": 801443,
+        "output_tokens": 18169,
+        "reasoning_tokens": 3458,
+        "cached_tokens": 638208,
+        "cache_input_tokens": 801443,
+        "cache_percent": 79.6,
+        "latency_ms": 10083,
+        "retries": 1
+      },
+      {
+        "key": null,
+        "calls": 38,
+        "total_tokens": 779884,
+        "input_tokens": 765330,
+        "output_tokens": 14554,
+        "reasoning_tokens": 5624,
+        "cached_tokens": 525312,
+        "cache_input_tokens": 765330,
+        "cache_percent": 68.6,
+        "latency_ms": 13544,
+        "retries": 0
+      },
+      {
+        "key": "leader:r3-frontend-category",
+        "calls": 33,
+        "total_tokens": 478906,
+        "input_tokens": 469317,
+        "output_tokens": 9589,
+        "reasoning_tokens": 2458,
+        "cached_tokens": 391424,
+        "cache_input_tokens": 469317,
+        "cache_percent": 83.4,
+        "latency_ms": 8748,
+        "retries": 3
+      },
+      {
+        "key": "leader:4aa9e7e0b38640b6b545528b242ea2fd",
+        "calls": 25,
+        "total_tokens": 270601,
+        "input_tokens": 263490,
+        "output_tokens": 7111,
+        "reasoning_tokens": 2594,
+        "cached_tokens": 187776,
+        "cache_input_tokens": 263490,
+        "cache_percent": 71.3,
+        "latency_ms": 8103,
+        "retries": 2
+      },
+      {
+        "key": "leader:r4-backend-markdown",
+        "calls": 12,
+        "total_tokens": 138877,
+        "input_tokens": 135895,
+        "output_tokens": 2982,
+        "reasoning_tokens": 772,
+        "cached_tokens": 105984,
+        "cache_input_tokens": 135895,
+        "cache_percent": 78.0,
+        "latency_ms": 7905,
+        "retries": 0
+      }
+    ],
+    "by_model": [
+      {
+        "key": "qwen3.7-max",
+        "calls": 121,
+        "total_tokens": 2359989,
+        "input_tokens": 2311801,
+        "output_tokens": 48188,
+        "reasoning_tokens": 14906,
+        "cached_tokens": 1847808,
+        "cache_input_tokens": 2311801,
+        "cache_percent": 79.9,
+        "latency_ms": 11758,
+        "retries": 0
+      },
+      {
+        "key": "qwen-flash",
+        "calls": 31,
+        "total_tokens": 127891,
+        "input_tokens": 123674,
+        "output_tokens": 4217,
+        "reasoning_tokens": 0,
+        "cached_tokens": 896,
+        "cache_input_tokens": 123674,
+        "cache_percent": 0.7,
+        "latency_ms": 3927,
+        "retries": 6
+      }
+    ],
+    "approvals": {
+      "human": 2,
+      "automatic": 34,
+      "allow_all": 0,
+      "pending": 0
+    },
+    "tool_calls": {
+      "total": 139,
+      "failed": 31
+    }
+  }
+}

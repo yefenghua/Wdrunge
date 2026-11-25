@@ -1,0 +1,14 @@
+
+> todo-experiment-frontend@0.1.0 build
+> tsc && vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 16 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.40 kB │ gzip:  0.29 kB
+dist/assets/index-d1IlPkBH.css    2.48 kB │ gzip:  0.93 kB
+dist/assets/index-CF90I8Yj.js   222.95 kB │ gzip: 69.91 kB
+
+✓ built in 129ms

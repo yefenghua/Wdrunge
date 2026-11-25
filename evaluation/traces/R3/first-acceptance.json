@@ -1,0 +1,23 @@
+{
+  "at": "2026-11-14T02:59:40.901Z",
+  "all_passed": false,
+  "groups": [
+    {
+      "group": "build_and_start",
+      "passed": true
+    },
+    {
+      "group": "migration_default_invalid",
+      "passed": true
+    },
+    {
+      "group": "failure",
+      "passed": false,
+      "error": "page.waitForFunction: Timeout 10000ms exceeded.\n    at visibleContents (/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-r3.mjs:15:58)\n    at /Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/acceptance/guestbook-r3.mjs:33:87"
+    }
+  ],
+  "service_logs": [
+    "INFO:     Started server process [33196]\nINFO:     Waiting for application startup.\nINFO:     Application startup complete.\nINFO:     Uvicorn running on http://127.0.0.1:8100 (Press CTRL+C to quit)\nINFO:     127.0.0.1:57029 - \"GET /api/health HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57029 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57036 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:57029 - \"POST /api/messages HTTP/1.1\" 400 Bad Request\nINFO:     127.0.0.1:57036 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57046 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57047 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57048 - \"GET /api/messages?category=feedback HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57049 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57051 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:57052 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57029 - \"POST /api/messages HTTP/1.1\" 201 Created\nINFO:     127.0.0.1:57057 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57058 - \"GET /api/messages HTTP/1.1\" 200 OK\nINFO:     127.0.0.1:57059 - \"GET /api/messages?category=general HTTP/1.1\" 200 OK\nINFO:     Shutting down\nINFO:     Waiting for application shutdown.\nINFO:     Application shutdown complete.\nINFO:     Finished server process [33196]\n",
+    "\n> todo-experiment-frontend@0.1.0 dev\n> vite --host 127.0.0.1 --port 15173 --strictPort\n\n10:59:26 AM [vite] (client) Re-optimizing dependencies because vite config has changed\n\n  VITE v8.3.8  ready in 219 ms\n\n  ➜  Local:   http://127.0.0.1:15173/\n"
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "started_at": "2026-11-14T02:40:39.047824+00:00",
+  "limit_seconds": 3000,
+  "model": "qwen3.7-max",
+  "context": "default, fresh session",
+  "scheduling": "serial; frontend only after backend delivery accepted completed"
+}

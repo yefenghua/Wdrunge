@@ -1,0 +1,18 @@
+# R3：留言板分类及筛选（Web，串行）
+
+请为现有电脑浏览器留言板增加分类及筛选，同步修改 SQLite、FastAPI 接口和 React 网页。分类只有 general（日常）和 feedback（反馈）；发布时可选，默认日常，列表显示分类。筛选全部／日常／反馈，默认全部，无匹配时提示。无需修改已有留言分类。
+
+分类持久化；旧留言默认日常，不丢数据；后端拒绝非法分类。保留发布、删除及简单样式，筛选后仅删除目标留言。
+
+本次必须串行：先只安排后端任务，形成几行接口约定、实现并通过接口检查。后端任务交付并被验收为 completed 后才能开始任何前端实现／修改，接口约定就绪或后端服务已启动都不算放行条件。若预建前端任务，必须通过 dependencies 依赖后端任务的完成，不可只依赖服务 needs，也不要用 delegate_tasks 并行派发前后端。记录后端验收和前端开始时间。保持默认上下文管理。
+
+验收两条（与R2业务要求一致）：
+1. 构建和启动成功；分类选择、显示、三种筛选及筛选后删除正确，接口约定一致。
+2. 默认值、非法分类、旧数据兼容及持久化正确，原有发布删除正常。
+
+总上限50分钟，最多正式返工1次。只做本次改动，自测通过后简短交付；外部集中验收一轮，失败仅复测相关内容，不重复R1整套检查。
+
+已备运行环境，无需重装：
+- 后端解释器：/Users/tiantian/Documents/Codex/2026-11-13/nin/work/experiment/guestbook/runs/R3/workspace/backend/.venv/bin/python。cwd=backend，以此解释器执行 -m uvicorn app.main:app --host 127.0.0.1 --port 8100，服务 keep_running=true。任务可能无自己的 .venv，平台允许在 backend cwd 只读复用源项目该环境；忽略遗留的 backend/env 空环境。
+- 前端 cwd=frontend，npm run dev -- --configLoader runner --host 127.0.0.1，15173端口，keep_running=true。构建 npm run build -- --configLoader runner。Vite缓存已放任务内 .vite-cache，共享 node_modules 只读，不删不重装。
+- command仅为可执行文件，参数单列arguments，相对路径以cwd为准。仅必要的新依赖才安装且network=true；不做系统或全局安装。内置browser_verify及Chromium已就绪。异步列表操作需等待目标内容显示再断言。
